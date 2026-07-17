@@ -683,7 +683,9 @@ hr { border: none; border-top: 1.5px solid var(--border); margin: 1rem 0; }
 <div class="toast" id="toast"></div>
 
 <script>
-const SHEET_URL = 'YOUR_GOOGLE_SHEET_CSV_URL';
+// Paste the deployed Google Apps Script Web App URL here (ends in /exec) once it's set up.
+// Until then, completion syncing silently no-ops — staff checklists work exactly as before.
+const COMPLETIONS_SYNC_URL = '';
 
 const ROLES_CFG = {
   gm:           { label:'General Manager', tabs:['home','checklists','duties','catering','notes','team'] },
@@ -1188,9 +1190,57 @@ function toggleCheck(key, idx) {
     const done = list.items.filter((_,i)=>checkStates[`${key}_${i}`]).length;
     const pill = document.getElementById(`pill_${key}`);
     if(pill) { pill.textContent=`${done}/${list.items.length}`; pill.className=`progress-pill ${done===list.items.length?'done':done>0?'partial':'none'}`; }
+    if (done === list.items.length) syncCompletion(key, list.label);
   }
   if(checkStates[id]) showToast('Marked complete ✓');
   buildHome();
+}
+
+// Reports a fully-completed checklist to the shared Google Sheet so GM/2IC can see it on the
+// Team tab. No-ops if COMPLETIONS_SYNC_URL isn't set up yet, and never blocks or throws —
+// staff's own checklist always works from local storage regardless of network/sync status.
+function todayKey() {
+  return new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
+}
+
+function syncCompletion(key, label) {
+  if (!COMPLETIONS_SYNC_URL) return;
+  const guardKey = `hw_synced_${key}_${todayKey()}`;
+  if (localStorage.getItem(guardKey)) return;
+  localStorage.setItem(guardKey, '1');
+  const payload = {
+    date: todayKey(),
+    name: currentUser.name,
+    key, label,
+    time: new Date().toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'})
+  };
+  // No custom headers — a plain string body avoids a CORS preflight against Apps Script.
+  fetch(COMPLETIONS_SYNC_URL, { method:'POST', body: JSON.stringify(payload) }).catch(()=>{});
+}
+
+function loadCompletionsFeed() {
+  const el = document.getElementById('completions-feed');
+  if (!el) return;
+  if (!COMPLETIONS_SYNC_URL) {
+    el.innerHTML = `<div class="schedule-row"><div class="sched-name">Sync not set up yet</div></div>`;
+    return;
+  }
+  el.innerHTML = `<div class="schedule-row"><div class="sched-name">Loading…</div></div>`;
+  fetch(`${COMPLETIONS_SYNC_URL}?date=${todayKey()}`)
+    .then(r => r.json())
+    .then(rows => {
+      const target = document.getElementById('completions-feed');
+      if (!target) return;
+      target.innerHTML = rows.length ? rows.map(r => `
+        <div class="schedule-row">
+          <div><div class="sched-name">✓ ${r.label}</div><div class="sched-role">${r.name}</div></div>
+          <div class="sched-time">${r.time}</div>
+        </div>`).join('') : `<div class="schedule-row"><div class="sched-name">No checklists completed yet today</div></div>`;
+    })
+    .catch(() => {
+      const target = document.getElementById('completions-feed');
+      if (target) target.innerHTML = `<div class="schedule-row"><div class="sched-name">Couldn't load — check connection</div></div>`;
+    });
 }
 
 function resetChecks() {
@@ -1384,8 +1434,14 @@ function buildTeam() {
     <div class="page-sub" style="margin-bottom:1rem;">On shift today${wk ? ' · Week of ' + wk.weekOf : ''}</div>
     <div class="card">${todayRows}</div>
     ${!wk ? `<div class="alert-box">🐾 No schedule loaded for the current week — send the latest schedule to update it.</div>` : ''}
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <span class="section-label">Today's Checklist Completions</span>
+      <span class="reset-link" onclick="loadCompletionsFeed()">↻ Refresh</span>
+    </div>
+    <div class="card" id="completions-feed"><div class="schedule-row"><div class="sched-name">Loading…</div></div></div>
     <span class="section-label">Full Staff Roster</span>
     <div class="card">${rosterRows}</div>`;
+  loadCompletionsFeed();
 }
 
 function showToast(msg) {
