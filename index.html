@@ -745,57 +745,213 @@ const TEAM = Object.values(ROSTER).map(p => ({
 }));
 
 // Weekly shift schedule for the "Today's Team" tab.
-// Replace this whole block each week with the new schedule (send Patty the updated PDF/screenshot).
+// Append a new week object here each time a new schedule comes in (send Patty the updated PDF/screenshot).
+// Old weeks can stay — buildTeam() picks whichever week contains today's date.
 // dayKey matches JS's en-US short weekday name: Mon/Tue/Wed/Thu/Fri/Sat/Sun.
-const SCHEDULE = {
-  weekOf: 'Jul 20, 2026',
-  weekStart: '2026-07-20', // ISO date of the Monday this schedule covers
-  days: {
-    Mon: [
-      { name:'Christopher Collier',    shift:'6:30a - 3:00p',  station:'BAR 1' },
-      { name:'Jayne Elise Dolinsky',   shift:'6:30a - 2:00p',  station:'POS 1' },
-      { name:'Marlon Gomez Hernandez', shift:'8:00a - 4:30p',  station:'BAR 1' }
-    ],
-    Tue: [
-      { name:'Crystal Vanessa Vasquez',   shift:'6:30a - 2:00p',  station:'2IC' },
-      { name:'Lisselys Martinez Sequera', shift:'8:00a - 3:00p',  station:'FOH EXPO' },
-      { name:'Marlon Gomez Hernandez',    shift:'8:00a - 4:30p',  station:'BAR 1' },
-      { name:'Melanie Moreno',            shift:'6:30a - 2:00p',  station:'BAR 1' },
-      { name:'Rahul Amin',                shift:'10:00a - 4:30p', station:'BAR 1' }
-    ],
-    Wed: [
-      { name:'Crystal Vanessa Vasquez',   shift:'6:30a - 2:00p',  station:'2IC' },
-      { name:'Jayne Elise Dolinsky',      shift:'10:00a - 4:30p', station:'POS 2' },
-      { name:'Lisselys Martinez Sequera', shift:'8:00a - 2:00p',  station:'FOH EXPO' },
-      { name:'Marlon Gomez Hernandez',    shift:'8:00a - 4:30p',  station:'BAR 1' },
-      { name:'Melanie Moreno',            shift:'6:30a - 2:00p',  station:'BAR 1' }
-    ],
-    Thu: [
-      { name:'Crystal Vanessa Vasquez',   shift:'10:00a - 4:30p', station:'2IC' },
-      { name:'Jayne Elise Dolinsky',      shift:'10:00a - 4:30p', station:'POS 1' },
-      { name:'Lisselys Martinez Sequera', shift:'8:00a - 4:30p',  station:'FOH EXPO' },
-      { name:'Melanie Moreno',            shift:'6:30a - 2:00p',  station:'BAR 1' }
-    ],
-    Fri: [
-      { name:'Christopher Collier',     shift:'6:30a - 2:00p', station:'BAR 1' },
-      { name:'Crystal Vanessa Vasquez', shift:'8:00a - 4:30p', station:'2IC' },
-      { name:'Jayne Elise Dolinsky',    shift:'8:00a - 4:30p', station:'BAR 1' },
-      { name:'Melanie Moreno',          shift:'6:30a - 2:00p', station:'POS 1' }
-    ],
-    Sat: [
-      { name:'Crystal Vanessa Vasquez',   shift:'8:00a - 4:30p',  station:'2IC' },
-      { name:'Marlon Gomez Hernandez',    shift:'8:00a - 4:30p',  station:'BAR 1' },
-      { name:'Melanie Moreno',            shift:'6:30a - 2:00p',  station:'BAR 1' },
-      { name:'Rahul Amin',                shift:'10:00a - 4:30p', station:'POS 1' }
-    ],
-    Sun: [
-      { name:'Christopher Collier',       shift:'6:30a - 3:00p',  station:'BAR 1' },
-      { name:'Jayne Elise Dolinsky',      shift:'8:00a - 4:30p',  station:'BAR 1' },
-      { name:'Lisselys Martinez Sequera', shift:'6:30a - 2:00p',  station:'POS 1' },
-      { name:'Rahul Amin',                shift:'10:00a - 4:30p', station:'BAR 1' }
-    ]
+const SCHEDULES = [
+  {
+    weekOf: 'Jul 13, 2026',
+    weekStart: '2026-07-13',
+    days: {
+      Mon: [
+        { name:'Lisselys Martinez Sequera', shift:'6:30a - 2:00p',  station:'POS 1' },
+        { name:'Marlon Gomez Hernandez',    shift:'8:00a - 4:30p',  station:'BAR 1' },
+        { name:'Seb Hickey',                shift:'6:30a - 3:00p',  station:'POS 2' }
+      ],
+      Tue: [
+        { name:'Crystal Vanessa Vasquez',   shift:'8:00a - 4:30p',  station:'2IC' },
+        { name:'Lisselys Martinez Sequera', shift:'8:00a - 3:00p',  station:'FOH EXPO' },
+        { name:'Marlon Gomez Hernandez',    shift:'10:00a - 4:30p', station:'POS 1' },
+        { name:'Melanie Moreno',            shift:'6:30a - 2:00p',  station:'BAR 1' },
+        { name:'Rahul Amin',                shift:'6:30a - 3:00p',  station:'POS 2' },
+        { name:'Seb Hickey',                shift:'8:00a - 4:30p',  station:'BAR 1' }
+      ],
+      Wed: [
+        { name:'Crystal Vanessa Vasquez',   shift:'8:00a - 4:30p', station:'2IC' },
+        { name:'Lisselys Martinez Sequera', shift:'6:30a - 3:00p', station:'POS 1' },
+        { name:'Marlon Gomez Hernandez',    shift:'8:00a - 4:00p', station:'POS 2' },
+        { name:'Melanie Moreno',            shift:'6:30a - 2:00p', station:'BAR 1' }
+      ],
+      Thu: [
+        { name:'Crystal Vanessa Vasquez',   shift:'6:30a - 2:00p',  station:'2IC' },
+        { name:'Jayne Elise Dolinsky',      shift:'10:00a - 4:30p', station:'POS 1' },
+        { name:'Lisselys Martinez Sequera', shift:'8:00a - 4:30p',  station:'FOH EXPO' },
+        { name:'Melanie Moreno',            shift:'6:30a - 2:00p',  station:'BAR 1' },
+        { name:'Patricia Germain',          shift:'8:00a - 4:30p',  station:'FOH' }
+      ],
+      Fri: [
+        { name:'Crystal Vanessa Vasquez',   shift:'6:30a - 2:00p',  station:'2IC' },
+        { name:'Jayne Elise Dolinsky',      shift:'10:00a - 4:30p', station:'POS 1' },
+        { name:'Marlon Gomez Hernandez',    shift:'8:00a - 4:30p',  station:'BAR 1' },
+        { name:'Melanie Moreno',            shift:'6:30a - 2:00p',  station:'POS 1' },
+        { name:'Patricia Germain',          shift:'8:00a - 4:30p',  station:'FOH' }
+      ],
+      Sat: [
+        { name:'Jayne Elise Dolinsky',      shift:'10:00a - 4:30p', station:'POS 1' },
+        { name:'Marlon Gomez Hernandez',    shift:'6:30a - 3:00p',  station:'BAR 1' },
+        { name:'Melanie Moreno',            shift:'6:30a - 2:00p',  station:'BAR 1' },
+        { name:'Patricia Germain',          shift:'8:00a - 4:30p',  station:'FOH' }
+      ],
+      Sun: [
+        { name:'Christopher Collier',     shift:'6:30a - 3:00p',  station:'BAR 1' },
+        { name:'Crystal Vanessa Vasquez', shift:'6:30a - 2:00p',  station:'BAR 1' },
+        { name:'Patricia Germain',        shift:'8:00a - 4:30p',  station:'FOH' },
+        { name:'Rahul Amin',              shift:'10:00a - 4:30p', station:'BAR 1' }
+      ]
+    }
+  },
+  {
+    weekOf: 'Jul 20, 2026',
+    weekStart: '2026-07-20',
+    days: {
+      Mon: [
+        { name:'Christopher Collier',    shift:'6:30a - 3:00p',  station:'BAR 1' },
+        { name:'Jayne Elise Dolinsky',   shift:'6:30a - 2:00p',  station:'POS 1' },
+        { name:'Marlon Gomez Hernandez', shift:'8:00a - 4:30p',  station:'BAR 1' }
+      ],
+      Tue: [
+        { name:'Crystal Vanessa Vasquez',   shift:'6:30a - 2:00p',  station:'2IC' },
+        { name:'Lisselys Martinez Sequera', shift:'8:00a - 3:00p',  station:'FOH EXPO' },
+        { name:'Marlon Gomez Hernandez',    shift:'8:00a - 4:30p',  station:'BAR 1' },
+        { name:'Melanie Moreno',            shift:'6:30a - 2:00p',  station:'BAR 1' },
+        { name:'Rahul Amin',                shift:'10:00a - 4:30p', station:'BAR 1' }
+      ],
+      Wed: [
+        { name:'Crystal Vanessa Vasquez',   shift:'6:30a - 2:00p',  station:'2IC' },
+        { name:'Jayne Elise Dolinsky',      shift:'10:00a - 4:30p', station:'POS 2' },
+        { name:'Lisselys Martinez Sequera', shift:'8:00a - 2:00p',  station:'FOH EXPO' },
+        { name:'Marlon Gomez Hernandez',    shift:'8:00a - 4:30p',  station:'BAR 1' },
+        { name:'Melanie Moreno',            shift:'6:30a - 2:00p',  station:'BAR 1' }
+      ],
+      Thu: [
+        { name:'Crystal Vanessa Vasquez',   shift:'10:00a - 4:30p', station:'2IC' },
+        { name:'Jayne Elise Dolinsky',      shift:'10:00a - 4:30p', station:'POS 1' },
+        { name:'Lisselys Martinez Sequera', shift:'8:00a - 4:30p',  station:'FOH EXPO' },
+        { name:'Melanie Moreno',            shift:'6:30a - 2:00p',  station:'BAR 1' }
+      ],
+      Fri: [
+        { name:'Christopher Collier',     shift:'6:30a - 2:00p', station:'BAR 1' },
+        { name:'Crystal Vanessa Vasquez', shift:'8:00a - 4:30p', station:'2IC' },
+        { name:'Jayne Elise Dolinsky',    shift:'8:00a - 4:30p', station:'BAR 1' },
+        { name:'Melanie Moreno',          shift:'6:30a - 2:00p', station:'POS 1' }
+      ],
+      Sat: [
+        { name:'Crystal Vanessa Vasquez',   shift:'8:00a - 4:30p',  station:'2IC' },
+        { name:'Marlon Gomez Hernandez',    shift:'8:00a - 4:30p',  station:'BAR 1' },
+        { name:'Melanie Moreno',            shift:'6:30a - 2:00p',  station:'BAR 1' },
+        { name:'Rahul Amin',                shift:'10:00a - 4:30p', station:'POS 1' }
+      ],
+      Sun: [
+        { name:'Christopher Collier',       shift:'6:30a - 3:00p',  station:'BAR 1' },
+        { name:'Jayne Elise Dolinsky',      shift:'8:00a - 4:30p',  station:'BAR 1' },
+        { name:'Lisselys Martinez Sequera', shift:'6:30a - 2:00p',  station:'POS 1' },
+        { name:'Rahul Amin',                shift:'10:00a - 4:30p', station:'BAR 1' }
+      ]
+    }
+  },
+  {
+    weekOf: 'Jul 27, 2026 (incomplete — see note in code comments below)',
+    weekStart: '2026-07-27',
+    days: {
+      Mon: [
+        { name:'Christopher Collier',  shift:'6:30a - 3:00p', station:'BAR 1' },
+        { name:'Jayne Elise Dolinsky', shift:'8:00a - 4:30p', station:'BAR 1' },
+        { name:'Melanie Moreno',       shift:'6:30a - 2:00p', station:'POS 1' }
+      ],
+      Tue: [
+        { name:'Christopher Collier',       shift:'8:00a - 4:30p',  station:'BAR 1' },
+        { name:'Jack Roden',                shift:'6:30a - 11:00a', station:'BAR 1' },
+        { name:'Lisselys Martinez Sequera', shift:'6:30a - 3:00p',  station:'BAR 1' },
+        { name:'Melanie Moreno',            shift:'6:30a - 3:00p',  station:'BAR 1' }
+      ],
+      Wed: [
+        { name:'Crystal Vanessa Vasquez',   shift:'6:30a - 2:00p', station:'2IC' },
+        { name:'Jayne Elise Dolinsky',      shift:'10:00a - 4:30p', station:'POS 2' },
+        { name:'Lisselys Martinez Sequera', shift:'8:00a - 2:00p', station:'FOH EXPO' },
+        { name:'Melanie Moreno',            shift:'6:30a - 2:00p', station:'BAR 1' }
+      ],
+      Thu: [
+        { name:'Crystal Vanessa Vasquez',   shift:'10:00a - 4:30p', station:'2IC' },
+        { name:'Jack Roden',                shift:'9:00a - 1:00p',  station:'BAR 1' },
+        { name:'Jayne Elise Dolinsky',      shift:'8:00a - 4:30p',  station:'POS 1' },
+        { name:'Lisselys Martinez Sequera', shift:'8:00a - 4:30p',  station:'FOH EXPO' },
+        { name:'Melanie Moreno',            shift:'6:30a - 2:00p',  station:'BAR 1' }
+      ],
+      Fri: [
+        { name:'Crystal Vanessa Vasquez', shift:'10:00a - 4:30p', station:'2IC' },
+        { name:'Jayne Elise Dolinsky',    shift:'8:00a - 4:30p',  station:'BAR 1' },
+        { name:'Melanie Moreno',          shift:'6:30a - 2:00p',  station:'POS 1' }
+      ],
+      Sat: [
+        { name:'Christopher Collier',       shift:'6:30a - 2:00p',  station:'BAR 1' },
+        { name:'Crystal Vanessa Vasquez',   shift:'8:00a - 4:30p',  station:'2IC' },
+        { name:'Jack Roden',                shift:'11:00a - 4:30p', station:'BAR 1' },
+        { name:'Lisselys Martinez Sequera', shift:'6:30a - 2:00p',  station:'BAR 1' }
+      ],
+      Sun: [
+        { name:'Christopher Collier', shift:'6:30a - 3:00p', station:'BAR 1' },
+        { name:'Jayne Elise Dolinsky', shift:'8:00a - 4:30p', station:'BAR 1' }
+      ]
+    }
+  },
+  {
+    weekOf: 'Aug 3, 2026 (incomplete — see note in code comments below)',
+    weekStart: '2026-08-03',
+    days: {
+      Mon: [
+        { name:'Christopher Collier',    shift:'6:30a - 3:00p', station:'BAR 1' },
+        { name:'Crystal Vanessa Vasquez',shift:'8:00a - 4:30p', station:'2IC' },
+        { name:'Jack Roden',             shift:'10:00a - 4:30p',station:'BAR 1' },
+        { name:'Marlon Gomez Hernandez', shift:'8:00a - 4:30p', station:'BAR 1' },
+        { name:'Melanie Moreno',         shift:'6:30a - 2:00p', station:'POS 1' }
+      ],
+      Tue: [
+        { name:'Christopher Collier',       shift:'10:00a - 4:30p', station:'BAR 1' },
+        { name:'Crystal Vanessa Vasquez',   shift:'8:00a - 4:30p',  station:'2IC' },
+        { name:'Lisselys Martinez Sequera', shift:'6:30a - 3:00p',  station:'POS 1' },
+        { name:'Marlon Gomez Hernandez',    shift:'8:00a - 4:30p',  station:'BAR 1' },
+        { name:'Melanie Moreno',            shift:'6:30a - 2:00p',  station:'BAR 1' },
+        { name:'Rahul Amin',                shift:'10:00a - 4:30p', station:'BAR 1' }
+      ],
+      Wed: [
+        { name:'Crystal Vanessa Vasquez',   shift:'6:30a - 2:00p', station:'2IC' },
+        { name:'Jack Roden',                shift:'10:00a - 4:30p',station:'BAR 1' },
+        { name:'Jayne Elise Dolinsky',      shift:'10:00a - 4:30p',station:'POS 2' },
+        { name:'Lisselys Martinez Sequera', shift:'8:00a - 3:00p', station:'FOH EXPO' },
+        { name:'Marlon Gomez Hernandez',    shift:'8:00a - 4:30p', station:'BAR 1' },
+        { name:'Melanie Moreno',            shift:'6:30a - 3:00p', station:'BAR 1' }
+      ],
+      Thu: [
+        { name:'Crystal Vanessa Vasquez',   shift:'10:00a - 4:30p', station:'2IC' },
+        { name:'Jack Roden',                shift:'8:00a - 4:30p',  station:'BAR 1' },
+        { name:'Jayne Elise Dolinsky',      shift:'8:00a - 4:30p',  station:'POS 1' },
+        { name:'Lisselys Martinez Sequera', shift:'6:30a - 2:00p',  station:'POS 1' },
+        { name:'Patricia Germain',          shift:'6:30a - 2:00p',  station:'BAR 1' }
+      ],
+      Fri: [
+        { name:'Jayne Elise Dolinsky',      shift:'10:00a - 4:30p', station:'BAR 1' },
+        { name:'Lisselys Martinez Sequera', shift:'6:30a - 3:00p',  station:'POS 1' },
+        { name:'Marlon Gomez Hernandez',    shift:'6:30a - 2:00p',  station:'BAR 1' }
+      ],
+      Sat: [
+        { name:'Jack Roden',             shift:'6:30a - 3:00p',  station:'BAR 1' },
+        { name:'Marlon Gomez Hernandez', shift:'6:30a - 3:00p',  station:'BAR 1' },
+        { name:'Rahul Amin',             shift:'8:00a - 4:30p',  station:'BAR 1' }
+      ],
+      Sun: [
+        { name:'Christopher Collier', shift:'6:30a - 3:00p',  station:'BAR 1' },
+        { name:'Jayne Elise Dolinsky',shift:'8:00a - 4:30p',  station:'POS 1' },
+        { name:'Rahul Amin',          shift:'6:30a - 3:00p',  station:'BAR 1' }
+      ]
+    }
   }
-};
+];
+// KNOWN GAPS (2026-07-17): Jul 27 week is missing one staff member's row entirely
+// (hidden behind a "Selected shifts deleted" toast in the screenshot Patty sent — likely
+// Patricia Germain) and has no data at all for Rahul Amin or Seb Hickey (rows were cut off
+// below the screenshot). Aug 3 week is missing Seb Hickey entirely, and Patricia Germain's
+// entry only reflects 1 of the 5 shifts the summary claimed ("39h | 5sh" but only Thursday
+// was visible). Ask Patty for a cleaner export/screenshot of these two weeks to fill the gaps.
 
 let currentUser = null, selectedRole = null;
 let checkStates = {}, urgentOn = false;
@@ -1104,24 +1260,31 @@ function sendNote() {
   setTimeout(()=>{ buildNotes(); buildHome(); buildNav(ROLES_CFG[currentUser.role].tabs); showToast('Note sent to team'); }, 900);
 }
 
+function findWeekSchedule(now) {
+  for (const wk of SCHEDULES) {
+    const start = new Date(wk.weekStart + 'T00:00:00');
+    const end = new Date(start);
+    end.setDate(end.getDate() + 6);
+    end.setHours(23, 59, 59, 999);
+    if (now >= start && now <= end) return wk;
+  }
+  return null;
+}
+
 function buildTeam() {
   if (!['gm','am'].includes(currentUser.role)) return;
 
   const now = new Date();
+  const wk = findWeekSchedule(now);
   const dayKey = now.toLocaleDateString('en-US', {weekday:'short'});
-  const todayShifts = (SCHEDULE.days[dayKey] || []).slice().sort((a,b) => a.shift.localeCompare(b.shift));
-
-  const weekStart = new Date(SCHEDULE.weekStart + 'T00:00:00');
-  const weekEnd = new Date(weekStart);
-  weekEnd.setDate(weekEnd.getDate() + 6);
-  const isStale = now < weekStart || now > weekEnd;
+  const todayShifts = wk ? (wk.days[dayKey] || []).slice().sort((a,b) => a.shift.localeCompare(b.shift)) : [];
 
   const todayRows = todayShifts.length ? todayShifts.map(m => `
       <div class="schedule-row">
         <div><div class="sched-name">${m.name}</div><div class="sched-role">${m.station}</div></div>
         <div class="sched-time">${m.shift}</div>
       </div>`).join('') : `
-      <div class="schedule-row"><div class="sched-name">No one scheduled today</div></div>`;
+      <div class="schedule-row"><div class="sched-name">${wk ? 'No one scheduled today' : 'No schedule loaded for this week'}</div></div>`;
 
   const rosterRows = TEAM.map(m => `
       <div class="schedule-row">
@@ -1130,9 +1293,9 @@ function buildTeam() {
 
   document.getElementById('tab-team').innerHTML = `
     <div class="page-title" style="margin-bottom:0.15rem;">Today's Team</div>
-    <div class="page-sub" style="margin-bottom:1rem;">On shift today · Week of ${SCHEDULE.weekOf}</div>
+    <div class="page-sub" style="margin-bottom:1rem;">On shift today${wk ? ' · Week of ' + wk.weekOf : ''}</div>
     <div class="card">${todayRows}</div>
-    ${isStale ? `<div class="alert-box">🐾 This schedule is for the week of ${SCHEDULE.weekOf} — send the new week's schedule to update it.</div>` : ''}
+    ${!wk ? `<div class="alert-box">🐾 No schedule loaded for the current week — send the latest schedule to update it.</div>` : ''}
     <span class="section-label">Full Staff Roster</span>
     <div class="card">${rosterRows}</div>`;
 }
