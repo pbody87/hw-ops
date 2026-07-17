@@ -325,6 +325,18 @@ html, body {
 .progress-pill.partial { background: var(--amber-light); color: var(--amber); }
 .progress-pill.none { background: var(--sky-pale); color: var(--sky-dark); }
 
+.checklist-cat-btn {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; background: white; border: 1.5px solid var(--border);
+  border-radius: 14px; padding: 1rem 1.1rem; margin-bottom: 0.7rem;
+  cursor: pointer; transition: all 0.15s; text-align: left;
+}
+.checklist-cat-btn:active { transform: scale(0.97); }
+.checklist-cat-left { display: flex; align-items: center; gap: 0.7rem; }
+.checklist-cat-icon { font-size: 1.4rem; }
+.checklist-cat-label { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.92rem; color: var(--text-primary); }
+.checklist-back-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.9rem; }
+
 .check-item {
   display: flex; align-items: flex-start;
   gap: 0.7rem; padding: 0.65rem 0;
@@ -691,10 +703,39 @@ const TAB_META = {
   team:       { icon:'👥',  label:'Team' }
 };
 
-const FOH_CHECKS = {
-  opening: { label:'FOH Opening', items:['Doors, windows, and outdoor signage checked','All FOH surfaces wiped and sanitized','Bar setup complete — espresso machine warmed and dialed in','POS opened, cash drawer counted and logged','Specials board updated with correct items','Condiment stations fully stocked','Milk, syrups, cups restocked to full par','Music on, lighting set, temperature comfortable','Pre-shift huddle completed'] },
-  midshift: { label:'FOH Mid-Shift', items:['Bar supplies restocked','Floor walked and wiped down','Bathroom checked and logged','Shift log updated with any issues','Catering pickups confirmed and staged'] },
-  closing: { label:'FOH Closing', items:['Bar cleaned down fully — machine backflushed','All surfaces sanitized','Cash drawer counted, variance documented','POS end-of-day reports run and saved','Chairs stacked or furniture reset','Lights off, music off, doors locked','Closing lead signs off'] }
+// Flat registry of every checklist, keyed uniquely so localStorage check-state never collides
+// across categories. Add new checklists here and reference them from CHECKLIST_CATEGORIES.
+const CHECKLISTS = {
+  'bar-open':  { label:'Bar Opening', items:['Espresso machine powered on, warmed, and dialed in','Grinders calibrated and dosed to standard','Milk, syrups, and modifiers stocked to full par','Bar surfaces wiped and sanitized','Ice bins filled, cups and lids stocked','Steam wands and portafilters cleaned and checked','Specials board / bar menu confirmed correct'] },
+  'bar-close': { label:'Bar Closing', items:['Espresso machine backflushed and wiped down','Grinders emptied and cleaned per spec','All bar surfaces sanitized','Milk and perishables stored, dated, and rotated','Bar trash emptied and liner replaced','Bar equipment powered down per closing procedure','Closing lead signs off on bar checklist'] },
+  'bar-eos':   { label:'Bar End of Shift', items:['Bar restocked to full par for next shift','Bar top and station wiped down and reset','Low stock or equipment issues reported to shift lead','Tip jar/till reconciled if applicable','Open notes handed off to next barista on shift'] },
+
+  'pos-open':  { label:'POS Opening', items:['POS terminal(s) powered on and logged in','Cash drawer counted and logged against par','Register tape / receipt paper stocked','Daily specials and 86\'d items entered into POS','Card reader / tap-to-pay confirmed working','Scheduled promos or discounts reviewed for the day'] },
+  'pos-close': { label:'POS Closing', items:['End-of-day POS report run and saved/exported','Cash drawer counted and reconciled, variance documented','Cash drawer secured per closing procedure','Voided or comped transactions logged with reason','Terminal powered down per closing procedure'] },
+  'pos-side':  { label:'POS Side Tasks', items:['Counter / POS area wiped down and organized','To-go supplies restocked (bags, sleeves, napkins, straws)','Condiment station near register checked and refilled','Menu boards and customer-facing screens wiped down','Merchandise/retail display straightened, if applicable'] },
+  'pos-eos':   { label:'POS End of Shift', items:['Drawer reconciled with incoming cashier before leaving','Discrepancies reported to shift lead immediately','Incoming cashier briefed on pending issues or VIP notes','Register area stocked and presentable for next shift'] },
+
+  'maint-daily':   { label:'Daily Maintenance & Cleaning', items:['All FOH and BOH floors swept and mopped','All trash and recycling emptied, liners replaced','High-touch surfaces sanitized (door handles, POS, menus)','Restrooms cleaned and restocked','Tables, chairs, and booths wiped down','Cardboard/recycling taken to designated area'] },
+  'maint-weekly':  { label:'Weekly Maintenance & Cleaning', items:['Espresso machine and grinders deep cleaned per schedule','Walk-in/reach-in coolers wiped down and organized','Windows and glass doors cleaned inside and out','Water-using equipment descaled as needed','Vents and exhaust fans checked and cleaned','Cleaning supplies inventoried and restocked'] },
+  'maint-monthly': { label:'Monthly Maintenance & Cleaning', items:['Floor drains and grease traps deep cleaned','Full equipment maintenance check (espresso machine, POS hardware)','Behind and under heavy equipment inspected and cleaned','Fire extinguisher and safety equipment dates checked','Laminated signage/menus reviewed and replaced if worn','Pest control walkthrough completed and logged'] },
+
+  'mgr-open':  { label:'Manager Opening', items:['Alarm disarmed, full floor walked for safety and cleanliness','Opening cash drawer(s) counted and logged against par','Overnight messages, emails, and notes reviewed for anything urgent','Opening FOH and BOH leads present and briefed','Catering calendar checked for same-day orders','Equipment walk — espresso machine, POS, walk-in — confirmed operational','Labor reviewed against forecasted sales, adjusted if needed','Specials and 86\'d items posted or confirmed'] },
+  'mgr-close': { label:'Manager Closing', items:['All cash drawers reconciled against POS end-of-day report, variance documented','Bank deposit prepped and secured in safe','Full space walked — FOH and BOH closing checklists confirmed complete and signed off','Next day\'s schedule and catering orders reviewed','Incidents, equipment issues, or guest complaints logged','Alarm set and all doors confirmed locked before leaving','End-of-day summary sent to team if anything needs follow-up'] }
+};
+
+// Which categories each role sees on the Checklists tab, and which lists live under each category.
+const CHECKLIST_CATEGORIES = [
+  { id:'bar',         label:'Bar',                     icon:'☕', lists:['bar-open','bar-close','bar-eos'] },
+  { id:'pos',         label:'POS',                     icon:'💳', lists:['pos-open','pos-close','pos-side','pos-eos'] },
+  { id:'maintenance', label:'Maintenance & Cleaning',  icon:'🧹', lists:['maint-daily','maint-weekly','maint-monthly'] },
+  { id:'manager',     label:'Manager',                 icon:'⭐', lists:['mgr-open','mgr-close'] }
+];
+
+const CHECKLIST_ROLE_CATEGORIES = {
+  gm:  ['manager'],
+  am:  ['bar','pos','maintenance','manager'],
+  foh: ['bar','pos','maintenance'],
+  catering: ['maintenance']
 };
 
 const BOH_CHECKS = {
@@ -981,7 +1022,7 @@ function login() {
 function logout() {
   if (!confirm('Sign out?')) return;
   localStorage.removeItem('hw_user');
-  currentUser = null; selectedRole = null;
+  currentUser = null; selectedRole = null; checklistCategory = null;
   document.getElementById('app-screen').classList.remove('active');
   document.getElementById('login-screen').classList.add('active');
   document.getElementById('name-input').value = '';
@@ -1054,23 +1095,64 @@ function buildHome() {
   `;
 }
 
+let checklistCategory = null;
+
 function getTotalChecks() {
   const role = currentUser.role;
-  let lists = [];
-  if (['foh','am','gm'].includes(role)) lists = Object.values(FOH_CHECKS);
-  else if (['boh','kitchen_lead'].includes(role)) lists = Object.values(BOH_CHECKS);
-  else if (role==='catering') lists = [FOH_CHECKS.opening];
-  return lists.reduce((a,l)=>a+l.items.length,0);
+  const catIds = CHECKLIST_ROLE_CATEGORIES[role] || [];
+  let total = 0;
+  catIds.forEach(id => {
+    CHECKLIST_CATEGORIES.find(c=>c.id===id).lists.forEach(key => { total += CHECKLISTS[key].items.length; });
+  });
+  return total;
+}
+
+function categoryProgress(catId) {
+  const cat = CHECKLIST_CATEGORIES.find(c=>c.id===catId);
+  let done=0, total=0;
+  cat.lists.forEach(key => {
+    const list = CHECKLISTS[key];
+    total += list.items.length;
+    done += list.items.filter((_,i)=>checkStates[`${key}_${i}`]).length;
+  });
+  return {done, total};
+}
+
+function openChecklistCategory(catId) {
+  checklistCategory = catId;
+  buildChecklists();
+}
+
+function backToChecklistCategories() {
+  checklistCategory = null;
+  buildChecklists();
 }
 
 function buildChecklists() {
   const role = currentUser.role;
-  let lists = {};
-  if (['foh','am','gm'].includes(role)) lists = FOH_CHECKS;
-  else if (['boh','kitchen_lead'].includes(role)) lists = BOH_CHECKS;
-  else lists = { opening: FOH_CHECKS.opening };
+  const catIds = CHECKLIST_ROLE_CATEGORIES[role] || [];
+  const cats = CHECKLIST_CATEGORIES.filter(c => catIds.includes(c.id));
 
-  const html = Object.entries(lists).map(([key,list]) => {
+  if (!checklistCategory || !catIds.includes(checklistCategory)) {
+    const buttonsHtml = cats.length ? cats.map(c => {
+      const {done,total} = categoryProgress(c.id);
+      const pill = total===0 ? 'none' : done===total ? 'done' : done>0 ? 'partial' : 'none';
+      return `<div class="checklist-cat-btn" onclick="openChecklistCategory('${c.id}')">
+        <div class="checklist-cat-left"><span class="checklist-cat-icon">${c.icon}</span><span class="checklist-cat-label">${c.label}</span></div>
+        <span class="progress-pill ${pill}">${done}/${total}</span>
+      </div>`;
+    }).join('') : `<div class="card"><div class="duty-item"><div class="duty-dot"></div>No checklists assigned to your role yet</div></div>`;
+
+    document.getElementById('tab-checklists').innerHTML = `
+      <div class="page-title" style="margin-bottom:0.15rem;">Checklists</div>
+      <div class="page-sub" style="margin-bottom:1rem;">Choose a checklist</div>
+      ${buttonsHtml}`;
+    return;
+  }
+
+  const cat = CHECKLIST_CATEGORIES.find(c => c.id === checklistCategory);
+  const html = cat.lists.map(key => {
+    const list = CHECKLISTS[key];
     const done = list.items.filter((_,i)=>checkStates[`${key}_${i}`]).length;
     const pill = done===list.items.length?'done':done>0?'partial':'none';
     return `<div class="card">
@@ -1087,9 +1169,9 @@ function buildChecklists() {
   }).join('');
 
   document.getElementById('tab-checklists').innerHTML = `
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.9rem;">
-      <div><div class="page-title">Checklists</div><div class="page-sub">Tap each item to mark complete</div></div>
-      <span class="reset-link" onclick="resetChecks()">Reset all</span>
+    <div class="checklist-back-row">
+      <div><span class="reset-link" onclick="backToChecklistCategories()">← Back</span><div class="page-title">${cat.label}</div></div>
+      <span class="reset-link" onclick="resetChecks()">Reset</span>
     </div>${html}`;
 }
 
@@ -1101,7 +1183,7 @@ function toggleCheck(key, idx) {
   const ct = document.getElementById(`ct_${key}_${idx}`);
   if(cb) cb.classList.toggle('checked', checkStates[id]);
   if(ct) ct.classList.toggle('done', checkStates[id]);
-  const list = FOH_CHECKS[key] || BOH_CHECKS[key];
+  const list = CHECKLISTS[key];
   if(list) {
     const done = list.items.filter((_,i)=>checkStates[`${key}_${i}`]).length;
     const pill = document.getElementById(`pill_${key}`);
@@ -1112,9 +1194,17 @@ function toggleCheck(key, idx) {
 }
 
 function resetChecks() {
-  if(!confirm('Reset all checklists?')) return;
-  checkStates = {}; localStorage.setItem('hw_checks', JSON.stringify(checkStates));
-  buildChecklists(); buildHome(); showToast('Checklists reset');
+  if (checklistCategory) {
+    if (!confirm('Reset this checklist?')) return;
+    CHECKLIST_CATEGORIES.find(c => c.id === checklistCategory).lists.forEach(key => {
+      CHECKLISTS[key].items.forEach((_,i) => { delete checkStates[`${key}_${i}`]; });
+    });
+  } else {
+    if (!confirm('Reset all checklists?')) return;
+    checkStates = {};
+  }
+  localStorage.setItem('hw_checks', JSON.stringify(checkStates));
+  buildChecklists(); buildHome(); showToast('Checklist reset');
 }
 
 function buildDuties() {
