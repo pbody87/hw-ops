@@ -625,7 +625,7 @@ hr { border: none; border-top: 1.5px solid var(--border); margin: 1rem 0; }
       </div>
       <div class="role-btn" data-role="am" onclick="selectRole(this)">
         <span class="role-icon">📋</span>
-        <span class="role-btn-name">Shift Lead</span>
+        <span class="role-btn-name">2IC</span>
         <span class="role-btn-sub">FOH + BOH</span>
       </div>
       <div class="role-btn" data-role="foh" onclick="selectRole(this)">
@@ -633,20 +633,10 @@ hr { border: none; border-top: 1.5px solid var(--border); margin: 1rem 0; }
         <span class="role-btn-name">FOH Staff</span>
         <span class="role-btn-sub">Bar + Floor</span>
       </div>
-      <div class="role-btn" data-role="boh" onclick="selectRole(this)">
-        <span class="role-icon">🍳</span>
-        <span class="role-btn-name">BOH Staff</span>
-        <span class="role-btn-sub">Kitchen</span>
-      </div>
       <div class="role-btn" data-role="catering" onclick="selectRole(this)">
         <span class="role-icon">📦</span>
         <span class="role-btn-name">Catering</span>
         <span class="role-btn-sub">Orders + Logistics</span>
-      </div>
-      <div class="role-btn" data-role="kitchen_lead" onclick="selectRole(this)">
-        <span class="role-icon">👨‍🍳</span>
-        <span class="role-btn-name">Kitchen Lead</span>
-        <span class="role-btn-sub">BOH + Catering</span>
       </div>
     </div>
     <button class="login-btn" onclick="login()">Enter the floor →</button>
@@ -685,7 +675,7 @@ const SHEET_URL = 'YOUR_GOOGLE_SHEET_CSV_URL';
 
 const ROLES_CFG = {
   gm:           { label:'General Manager', tabs:['home','checklists','duties','catering','notes','team'] },
-  am:           { label:'Shift Lead',      tabs:['home','checklists','duties','catering','notes'] },
+  am:           { label:'2IC',             tabs:['home','checklists','duties','catering','notes'] },
   foh:          { label:'FOH Staff',       tabs:['home','checklists','duties','notes'] },
   boh:          { label:'BOH Staff',       tabs:['home','checklists','duties','notes'] },
   kitchen_lead: { label:'Kitchen Lead',    tabs:['home','checklists','duties','catering','notes'] },
@@ -1037,7 +1027,7 @@ function sendNote() {
   const selAud = document.querySelector('.aud-pill.sel');
   const audience = selAud ? selAud.dataset.aud : 'all';
   const now = new Date();
-  const time = now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  const time = now.toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
   const note = { text, audience, urgent:urgentOn, from:currentUser.name, time, id: Date.now() };
   gmNotes.push(note);
   localStorage.setItem('hw_notes', JSON.stringify(gmNotes));
