@@ -734,8 +734,7 @@ const ROSTER = {
   'lisselys martinez sequera': { role:'foh', name:'Lisselys Martinez Sequera' },
   'marlon gomez hernandez':    { role:'foh', name:'Marlon Gomez Hernandez' },
   'melanie moreno':            { role:'foh', name:'Melanie Moreno' },
-  'rahul amin':                { role:'foh', name:'Rahul Amin' },
-  'seb hickey':                { role:'foh', name:'Seb Hickey' }
+  'rahul amin':                { role:'foh', name:'Rahul Amin' }
 };
 
 const ROLE_TEAM_LABEL = { gm:'General Manager', am:'2IC', foh:'FOH Staff' };
@@ -755,16 +754,14 @@ const SCHEDULES = [
     days: {
       Mon: [
         { name:'Lisselys Martinez Sequera', shift:'6:30a - 2:00p',  station:'POS 1' },
-        { name:'Marlon Gomez Hernandez',    shift:'8:00a - 4:30p',  station:'BAR 1' },
-        { name:'Seb Hickey',                shift:'6:30a - 3:00p',  station:'POS 2' }
+        { name:'Marlon Gomez Hernandez',    shift:'8:00a - 4:30p',  station:'BAR 1' }
       ],
       Tue: [
         { name:'Crystal Vanessa Vasquez',   shift:'8:00a - 4:30p',  station:'2IC' },
         { name:'Lisselys Martinez Sequera', shift:'8:00a - 3:00p',  station:'FOH EXPO' },
         { name:'Marlon Gomez Hernandez',    shift:'10:00a - 4:30p', station:'POS 1' },
         { name:'Melanie Moreno',            shift:'6:30a - 2:00p',  station:'BAR 1' },
-        { name:'Rahul Amin',                shift:'6:30a - 3:00p',  station:'POS 2' },
-        { name:'Seb Hickey',                shift:'8:00a - 4:30p',  station:'BAR 1' }
+        { name:'Rahul Amin',                shift:'6:30a - 3:00p',  station:'POS 2' }
       ],
       Wed: [
         { name:'Crystal Vanessa Vasquez',   shift:'8:00a - 4:30p', station:'2IC' },
@@ -776,26 +773,22 @@ const SCHEDULES = [
         { name:'Crystal Vanessa Vasquez',   shift:'6:30a - 2:00p',  station:'2IC' },
         { name:'Jayne Elise Dolinsky',      shift:'10:00a - 4:30p', station:'POS 1' },
         { name:'Lisselys Martinez Sequera', shift:'8:00a - 4:30p',  station:'FOH EXPO' },
-        { name:'Melanie Moreno',            shift:'6:30a - 2:00p',  station:'BAR 1' },
-        { name:'Patricia Germain',          shift:'8:00a - 4:30p',  station:'FOH' }
+        { name:'Melanie Moreno',            shift:'6:30a - 2:00p',  station:'BAR 1' }
       ],
       Fri: [
         { name:'Crystal Vanessa Vasquez',   shift:'6:30a - 2:00p',  station:'2IC' },
         { name:'Jayne Elise Dolinsky',      shift:'10:00a - 4:30p', station:'POS 1' },
         { name:'Marlon Gomez Hernandez',    shift:'8:00a - 4:30p',  station:'BAR 1' },
-        { name:'Melanie Moreno',            shift:'6:30a - 2:00p',  station:'POS 1' },
-        { name:'Patricia Germain',          shift:'8:00a - 4:30p',  station:'FOH' }
+        { name:'Melanie Moreno',            shift:'6:30a - 2:00p',  station:'POS 1' }
       ],
       Sat: [
         { name:'Jayne Elise Dolinsky',      shift:'10:00a - 4:30p', station:'POS 1' },
         { name:'Marlon Gomez Hernandez',    shift:'6:30a - 3:00p',  station:'BAR 1' },
-        { name:'Melanie Moreno',            shift:'6:30a - 2:00p',  station:'BAR 1' },
-        { name:'Patricia Germain',          shift:'8:00a - 4:30p',  station:'FOH' }
+        { name:'Melanie Moreno',            shift:'6:30a - 2:00p',  station:'BAR 1' }
       ],
       Sun: [
         { name:'Christopher Collier',     shift:'6:30a - 3:00p',  station:'BAR 1' },
         { name:'Crystal Vanessa Vasquez', shift:'6:30a - 2:00p',  station:'BAR 1' },
-        { name:'Patricia Germain',        shift:'8:00a - 4:30p',  station:'FOH' },
         { name:'Rahul Amin',              shift:'10:00a - 4:30p', station:'BAR 1' }
       ]
     }
@@ -925,8 +918,7 @@ const SCHEDULES = [
         { name:'Crystal Vanessa Vasquez',   shift:'10:00a - 4:30p', station:'2IC' },
         { name:'Jack Roden',                shift:'8:00a - 4:30p',  station:'BAR 1' },
         { name:'Jayne Elise Dolinsky',      shift:'8:00a - 4:30p',  station:'POS 1' },
-        { name:'Lisselys Martinez Sequera', shift:'6:30a - 2:00p',  station:'POS 1' },
-        { name:'Patricia Germain',          shift:'6:30a - 2:00p',  station:'BAR 1' }
+        { name:'Lisselys Martinez Sequera', shift:'6:30a - 2:00p',  station:'POS 1' }
       ],
       Fri: [
         { name:'Jayne Elise Dolinsky',      shift:'10:00a - 4:30p', station:'BAR 1' },
@@ -946,12 +938,16 @@ const SCHEDULES = [
     }
   }
 ];
-// KNOWN GAPS (2026-07-17): Jul 27 week is missing one staff member's row entirely
-// (hidden behind a "Selected shifts deleted" toast in the screenshot Patty sent — likely
-// Patricia Germain) and has no data at all for Rahul Amin or Seb Hickey (rows were cut off
-// below the screenshot). Aug 3 week is missing Seb Hickey entirely, and Patricia Germain's
-// entry only reflects 1 of the 5 shifts the summary claimed ("39h | 5sh" but only Thursday
-// was visible). Ask Patty for a cleaner export/screenshot of these two weeks to fill the gaps.
+
+// Standing shifts that repeat every week regardless of which SCHEDULES week is loaded —
+// for staff whose hours don't come from the rotating FOH schedule (e.g. management).
+// `days` uses the same Mon/Tue/Wed/Thu/Fri/Sat/Sun keys as SCHEDULES.
+const RECURRING_SHIFTS = [
+  { name:'Patricia Germain', shift:'8:00a - 4:30p', station:'Manager', days:['Sun','Mon','Tue','Wed','Thu'] }
+];
+
+// KNOWN GAP (2026-07-17): Jul 27 week has no data for Rahul Amin — his row was below where
+// the screenshot Patty sent cut off. Ask her for that one week's shifts to fill it in.
 
 let currentUser = null, selectedRole = null;
 let checkStates = {}, urgentOn = false;
@@ -1277,7 +1273,9 @@ function buildTeam() {
   const now = new Date();
   const wk = findWeekSchedule(now);
   const dayKey = now.toLocaleDateString('en-US', {weekday:'short'});
-  const todayShifts = wk ? (wk.days[dayKey] || []).slice().sort((a,b) => a.shift.localeCompare(b.shift)) : [];
+  const weekShifts = wk ? (wk.days[dayKey] || []) : [];
+  const recurringToday = RECURRING_SHIFTS.filter(r => r.days.includes(dayKey));
+  const todayShifts = weekShifts.concat(recurringToday).sort((a,b) => a.shift.localeCompare(b.shift));
 
   const todayRows = todayShifts.length ? todayShifts.map(m => `
       <div class="schedule-row">
