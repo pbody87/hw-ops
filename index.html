@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="H&W Ops">
+<meta name="theme-color" content="#5b9ec9">
+<title>Hutch & Waldo Ops</title>
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sky: #5b9ec9;
+  --sky-dark: #3d7fa8;
+  --sky-light: #a8d4ee;
+  --sky-pale: #e8f4fb;
+  --white: #ffffff;
+  --off-white: #f7fbfe;
+  --cream: #fdf9f4;
+  --text-primary: #1a2e3b;
+  --text-secondary: #3d5a6e;
+  --text-muted: #7a9cb0;
+  --border: #c8dff0;
+  --green: #4a9e6e;
+  --green-light: #e6f5ed;
+  --amber: #d4853a;
+  --amber-light: #fdf0e4;
+  --red: #c44d44;
+  --red-light: #fce8e7;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  height: 100%;
+  font-family: 'Nunito Sans', sans-serif;
+  background: var(--sky);
+  color: var(--text-primary);
+  overflow: hidden;
+}
+
+.screen { display: none; flex-direction: column; height: 100vh; height: 100dvh; }
+.screen.active { display: flex; }
+
+/* ── LOGIN ── */
+#login-screen {
+  background: linear-gradient(160deg, var(--sky) 0%, var(--sky-dark) 100%);
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.5rem;
+}
+
+.login-brand {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.bulldog-icon {
+  font-size: 3.5rem;
+  margin-bottom: 0.5rem;
+  display: block;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.15));
+}
+
+.login-brand h1 {
+  font-family: 'Nunito', sans-serif;
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--white);
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+
+.login-brand h1 span {
+  font-style: italic;
+  font-weight: 700;
+  color: rgba(255,255,255,0.7);
+}
+
+.login-brand p {
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.65);
+  margin-top: 0.25rem;
+}
+
+.login-box {
+  width: 100%;
+  max-width: 340px;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 20px;
+  padding: 1.5rem;
+  backdrop-filter: blur(10px);
+}
+
+.login-label {
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.75);
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.name-input {
+  width: 100%;
+  background: rgba(255,255,255,0.9);
+  border: 2px solid transparent;
+  border-radius: 12px;
+  padding: 0.8rem 1rem;
+  color: var(--text-primary);
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  outline: none;
+  margin-bottom: 1.1rem;
+  transition: all 0.2s;
+}
+.name-input:focus { border-color: rgba(255,255,255,0.8); background: white; }
+.name-input::placeholder { color: #aac; font-weight: 400; }
+
+.role-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+  margin-bottom: 1.1rem;
+}
+
+.role-btn {
+  background: rgba(255,255,255,0.15);
+  border: 1.5px solid rgba(255,255,255,0.25);
+  border-radius: 12px;
+  padding: 0.85rem 0.6rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+}
+.role-btn:active { transform: scale(0.95); }
+.role-btn.selected {
+  background: white;
+  border-color: white;
+}
+.role-btn.selected .role-btn-name { color: var(--sky-dark); }
+.role-btn.selected .role-btn-sub { color: var(--text-muted); }
+
+.role-icon { font-size: 1.4rem; margin-bottom: 0.3rem; display: block; }
+.role-btn-name {
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: white;
+  display: block;
+  line-height: 1.2;
+}
+.role-btn-sub {
+  font-size: 0.65rem;
+  color: rgba(255,255,255,0.6);
+  font-weight: 400;
+}
+
+.login-btn {
+  width: 100%;
+  background: white;
+  border: none;
+  border-radius: 12px;
+  padding: 0.9rem;
+  color: var(--sky-dark);
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.login-btn:active { transform: scale(0.97); opacity: 0.9; }
+
+/* ── APP SHELL ── */
+#app-screen { background: var(--off-white); }
+
+.app-header {
+  background: var(--sky);
+  padding: calc(var(--safe-top) + 0.7rem) 1.1rem 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  box-shadow: 0 2px 12px rgba(91,158,201,0.25);
+}
+
+.app-brand {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 900;
+  font-size: 1.15rem;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+}
+.app-brand span { font-style: italic; font-weight: 700; opacity: 0.75; }
+.app-location {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.65);
+  margin-left: 0.4rem;
+}
+
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 20px;
+  padding: 0.25rem 0.65rem 0.25rem 0.3rem;
+  cursor: pointer;
+}
+.user-avatar {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.65rem; font-weight: 800;
+  background: white; color: var(--sky-dark);
+}
+.user-name { font-size: 0.75rem; font-weight: 700; color: white; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* BOTTOM NAV */
+.bottom-nav {
+  background: white;
+  border-top: 1.5px solid var(--border);
+  display: flex;
+  padding-bottom: var(--safe-bottom);
+  flex-shrink: 0;
+  box-shadow: 0 -2px 12px rgba(0,0,0,0.06);
+}
+
+.nav-item {
+  flex: 1;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 0.15rem;
+  padding: 0.6rem 0.5rem;
+  cursor: pointer; border: none; background: none;
+  transition: all 0.15s; position: relative;
+}
+.nav-item:active { opacity: 0.6; }
+.nav-icon { font-size: 1.25rem; }
+.nav-label {
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.58rem; font-weight: 800;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--text-muted);
+}
+.nav-item.active .nav-label { color: var(--sky-dark); }
+.nav-item.active::after {
+  content: ''; position: absolute;
+  top: 0; left: 50%; transform: translateX(-50%);
+  width: 28px; height: 3px;
+  background: var(--sky); border-radius: 0 0 3px 3px;
+}
+
+.notif-dot {
+  position: absolute; top: 6px; right: calc(50% - 14px);
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--red); border: 2px solid white;
+}
+
+/* SCROLLABLE CONTENT */
+.app-content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.tab-view { display: none; padding: 1.1rem; animation: fadeUp 0.25s ease; }
+.tab-view.active { display: block; }
+@keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+/* SECTION HEADERS */
+.page-title {
+  font-family: 'Nunito', sans-serif;
+  font-size: 1.3rem; font-weight: 900;
+  color: var(--text-primary); margin-bottom: 0.15rem;
+  letter-spacing: -0.01em;
+}
+.page-sub { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.1rem; font-weight: 600; }
+
+.section-label {
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.65rem; font-weight: 800;
+  letter-spacing: 0.13em; text-transform: uppercase;
+  color: var(--text-muted); margin-bottom: 0.5rem; display: block;
+}
+
+/* CARDS */
+.card {
+  background: white;
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 1rem 1.1rem;
+  margin-bottom: 0.9rem;
+}
+
+/* CHECKLIST */
+.checklist-top {
+  display: flex; align-items: center;
+  justify-content: space-between; margin-bottom: 0.85rem;
+}
+.checklist-title-text {
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.95rem; font-weight: 800;
+  color: var(--text-primary);
+}
+.progress-pill {
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.68rem; font-weight: 800;
+  padding: 0.2rem 0.6rem; border-radius: 20px;
+}
+.progress-pill.done { background: var(--green-light); color: var(--green); }
+.progress-pill.partial { background: var(--amber-light); color: var(--amber); }
+.progress-pill.none { background: var(--sky-pale); color: var(--sky-dark); }
+
+.check-item {
+  display: flex; align-items: flex-start;
+  gap: 0.7rem; padding: 0.65rem 0;
+  border-bottom: 1px solid var(--sky-pale);
+  cursor: pointer; transition: opacity 0.15s;
+}
+.check-item:last-child { border-bottom: none; }
+.check-item:active { opacity: 0.6; }
+
+.check-box {
+  width: 22px; height: 22px;
+  border: 2px solid var(--border); border-radius: 7px;
+  flex-shrink: 0; display: flex;
+  align-items: center; justify-content: center;
+  transition: all 0.15s; margin-top: 0px;
+}
+.check-box.checked { background: var(--sky); border-color: var(--sky); }
+.check-box.checked::after {
+  content: '';
+  width: 11px; height: 6px;
+  border-left: 2.5px solid white;
+  border-bottom: 2.5px solid white;
+  transform: rotate(-45deg) translateY(-1px);
+}
+.check-text {
+  font-size: 0.84rem; color: var(--text-secondary);
+  line-height: 1.45; font-weight: 600; padding-top: 2px;
+}
+.check-text.done { text-decoration: line-through; color: var(--text-muted); font-weight: 400; }
+
+/* DUTY LIST */
+.duty-item {
+  display: flex; gap: 0.6rem;
+  padding: 0.55rem 0; border-bottom: 1px solid var(--sky-pale);
+  font-size: 0.83rem; color: var(--text-secondary);
+  line-height: 1.45; font-weight: 600;
+}
+.duty-item:last-child { border-bottom: none; }
+.duty-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--sky-light); flex-shrink: 0; margin-top: 0.42rem;
+}
+
+/* STAT CARDS */
+.stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; margin-bottom: 0.9rem; }
+.stat-card {
+  background: white; border: 1.5px solid var(--border);
+  border-radius: 14px; padding: 1rem; text-align: center;
+}
+.stat-value {
+  font-family: 'Nunito', sans-serif;
+  font-size: 1.8rem; font-weight: 900;
+  color: var(--sky-dark); margin-bottom: 0.15rem;
+}
+.stat-label {
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.62rem; font-weight: 800;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* TAGS */
+.role-tag {
+  display: inline-flex; align-items: center;
+  padding: 0.25rem 0.65rem; border-radius: 20px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.65rem; font-weight: 800;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  margin-bottom: 0.85rem;
+}
+.rt-foh { background: var(--sky-pale); color: var(--sky-dark); }
+.rt-boh { background: #fde8e8; color: #a03030; }
+.rt-mgmt { background: #1a2e3b; color: var(--sky-light); }
+.rt-catering { background: var(--amber-light); color: var(--amber); }
+
+/* CATERING CARDS */
+.catering-card {
+  background: white; border: 1.5px solid var(--border);
+  border-radius: 14px; padding: 0.9rem 1rem;
+  margin-bottom: 0.7rem; position: relative; overflow: hidden;
+}
+.catering-card::before {
+  content: ''; position: absolute;
+  left: 0; top: 0; bottom: 0; width: 4px;
+  border-radius: 4px 0 0 4px;
+}
+.catering-card.pending::before { background: var(--amber); }
+.catering-card.confirmed::before { background: var(--sky); }
+.catering-card.ready::before { background: var(--green); }
+
+.catering-client { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.92rem; color: var(--text-primary); margin-bottom: 0.2rem; }
+.catering-meta { font-size: 0.72rem; color: var(--text-muted); font-weight: 600; margin-bottom: 0.5rem; }
+.catering-detail { font-size: 0.8rem; color: var(--text-secondary); font-weight: 600; line-height: 1.4; margin-bottom: 0.55rem; }
+.status-badge {
+  display: inline-block; padding: 0.2rem 0.6rem; border-radius: 20px;
+  font-family: 'Nunito', sans-serif; font-size: 0.65rem; font-weight: 800;
+  letter-spacing: 0.05em; text-transform: uppercase;
+}
+.sb-pending { background: var(--amber-light); color: var(--amber); }
+.sb-confirmed { background: var(--sky-pale); color: var(--sky-dark); }
+.sb-ready { background: var(--green-light); color: var(--green); }
+
+/* NOTES */
+.note-compose {
+  background: white; border: 1.5px solid var(--border);
+  border-radius: 14px; padding: 1rem; margin-bottom: 0.9rem;
+}
+.note-compose textarea {
+  width: 100%; border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 0.75rem 0.9rem;
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 0.88rem; font-weight: 600;
+  color: var(--text-primary); resize: none; outline: none;
+  background: var(--off-white); line-height: 1.5;
+  min-height: 80px; transition: border-color 0.2s;
+}
+.note-compose textarea:focus { border-color: var(--sky); }
+.note-compose textarea::placeholder { color: var(--text-muted); font-weight: 400; }
+
+.audience-row {
+  display: flex; gap: 0.45rem; flex-wrap: wrap;
+  margin: 0.75rem 0;
+}
+.aud-pill {
+  padding: 0.3rem 0.75rem; border-radius: 20px;
+  font-family: 'Nunito', sans-serif; font-size: 0.7rem; font-weight: 800;
+  cursor: pointer; border: 1.5px solid var(--border);
+  background: white; color: var(--text-muted);
+  transition: all 0.15s; letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.aud-pill.sel { background: var(--sky); border-color: var(--sky); color: white; }
+.aud-pill.sel.boh { background: #a03030; border-color: #a03030; }
+.aud-pill.sel.cat { background: var(--amber); border-color: var(--amber); }
+
+.urgent-row {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 0; border-top: 1px solid var(--sky-pale);
+  margin-bottom: 0.65rem;
+}
+.urgent-label { font-size: 0.83rem; font-weight: 700; color: var(--text-secondary); }
+.toggle-sw {
+  width: 38px; height: 22px; border-radius: 11px;
+  background: var(--border); position: relative; cursor: pointer;
+  transition: background 0.2s;
+}
+.toggle-sw.on { background: var(--red); }
+.toggle-sw::after {
+  content: ''; position: absolute;
+  left: 3px; top: 3px;
+  width: 16px; height: 16px;
+  border-radius: 50%; background: white;
+  transition: left 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+.toggle-sw.on::after { left: 19px; }
+
+.send-note-btn {
+  width: 100%; background: var(--sky); border: none;
+  border-radius: 10px; padding: 0.8rem;
+  color: white; font-family: 'Nunito', sans-serif;
+  font-size: 0.88rem; font-weight: 900;
+  text-transform: uppercase; letter-spacing: 0.05em;
+  cursor: pointer; transition: all 0.15s;
+}
+.send-note-btn:active { transform: scale(0.97); opacity: 0.9; }
+.send-note-btn.sent { background: var(--green); }
+
+.note-feed-card {
+  background: white; border: 1.5px solid var(--border);
+  border-radius: 14px; padding: 0.9rem 1rem;
+  margin-bottom: 0.7rem; position: relative; overflow: hidden;
+}
+.note-feed-card::before {
+  content: ''; position: absolute;
+  left: 0; top: 0; bottom: 0; width: 4px;
+  border-radius: 4px 0 0 4px;
+}
+.note-feed-card.urgent::before { background: var(--red); }
+.note-feed-card.normal::before { background: var(--sky); }
+.note-feed-card.info::before { background: var(--green); }
+
+.urgent-banner-card {
+  background: var(--red); border-radius: 14px;
+  padding: 0.9rem 1rem; margin-bottom: 0.9rem;
+  display: flex; gap: 0.75rem; align-items: flex-start;
+}
+.urgent-banner-card .note-text-b { font-size: 0.85rem; color: white; font-weight: 700; line-height: 1.5; }
+.urgent-banner-card .note-from-b { font-size: 0.7rem; color: rgba(255,255,255,0.75); font-weight: 700; margin-top: 0.3rem; }
+
+.note-top-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.35rem; }
+.note-from-name { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.85rem; color: var(--text-primary); }
+.note-time-str { font-size: 0.68rem; color: var(--text-muted); font-weight: 600; }
+.note-body-text { font-size: 0.83rem; color: var(--text-secondary); font-weight: 600; line-height: 1.5; margin-bottom: 0.45rem; }
+.note-aud-badge {
+  display: inline-block; padding: 0.18rem 0.55rem; border-radius: 20px;
+  font-family: 'Nunito', sans-serif; font-size: 0.62rem; font-weight: 800;
+  letter-spacing: 0.05em; text-transform: uppercase;
+}
+.nab-all { background: #1a2e3b; color: var(--sky-light); }
+.nab-foh { background: var(--sky-pale); color: var(--sky-dark); }
+.nab-boh { background: #fde8e8; color: #a03030; }
+.nab-cat { background: var(--amber-light); color: var(--amber); }
+.urgent-flag {
+  display: inline-flex; align-items: center; gap: 3px;
+  background: var(--red-light); color: var(--red);
+  border-radius: 20px; padding: 0.18rem 0.55rem;
+  font-family: 'Nunito', sans-serif; font-size: 0.62rem; font-weight: 800;
+  letter-spacing: 0.04em; text-transform: uppercase;
+  margin-left: 0.4rem;
+}
+
+/* SCHEDULE */
+.schedule-row {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 0.7rem 0; border-bottom: 1px solid var(--sky-pale);
+}
+.schedule-row:last-child { border-bottom: none; }
+.sched-name { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.88rem; color: var(--text-primary); }
+.sched-role { font-size: 0.72rem; color: var(--text-muted); font-weight: 600; }
+.sched-time { font-size: 0.75rem; color: var(--text-secondary); font-weight: 700; text-align: right; }
+
+/* ALERT BOX */
+.alert-box {
+  background: var(--sky-pale); border: 1.5px solid var(--sky-light);
+  border-radius: 12px; padding: 0.8rem 0.9rem;
+  font-size: 0.8rem; color: var(--sky-dark); font-weight: 600;
+  margin-bottom: 0.9rem; line-height: 1.5;
+  display: flex; gap: 0.6rem; align-items: flex-start;
+}
+
+/* BUTTONS */
+.btn {
+  display: block; width: 100%; padding: 0.82rem;
+  border-radius: 12px; border: none;
+  font-family: 'Nunito', sans-serif; font-size: 0.88rem; font-weight: 900;
+  letter-spacing: 0.04em; text-transform: uppercase;
+  cursor: pointer; transition: all 0.15s; text-align: center;
+  margin-bottom: 0.6rem;
+}
+.btn:active { transform: scale(0.97); }
+.btn.primary { background: var(--sky); color: white; }
+.btn.secondary { background: white; color: var(--sky-dark); border: 1.5px solid var(--border); }
+
+/* TOAST */
+.toast {
+  position: fixed;
+  bottom: calc(72px + var(--safe-bottom) + 12px);
+  left: 50%; transform: translateX(-50%) translateY(12px);
+  background: var(--text-primary); color: white;
+  padding: 0.6rem 1.2rem; border-radius: 20px;
+  font-family: 'Nunito', sans-serif; font-size: 0.8rem; font-weight: 700;
+  opacity: 0; transition: all 0.28s;
+  pointer-events: none; white-space: nowrap; z-index: 999;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+hr { border: none; border-top: 1.5px solid var(--border); margin: 1rem 0; }
+
+/* RESET */
+.reset-link {
+  font-family: 'Nunito', sans-serif; font-size: 0.68rem; font-weight: 800;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--text-muted); cursor: pointer;
+}
+
+/* GOOD COFFEE BADGE */
+.tagline-badge {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: white; border: 1.5px solid var(--border);
+  border-radius: 20px; padding: 0.3rem 0.8rem;
+  font-family: 'Nunito', sans-serif; font-size: 0.7rem; font-weight: 800;
+  color: var(--sky-dark); letter-spacing: 0.04em;
+  margin-bottom: 0.9rem;
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen" class="screen active">
+  <div class="login-brand">
+    <span class="bulldog-icon">🐾</span>
+    <h1>HUTCH <span>&</span> WALDO</h1>
+    <p>Good coffee, good people</p>
+  </div>
+  <div class="login-box">
+    <span class="login-label">Your name</span>
+    <input class="name-input" id="name-input" type="text" placeholder="First name" autocomplete="off" autocorrect="off">
+    <span class="login-label">Your role</span>
+    <div class="role-grid" id="role-grid">
+      <div class="role-btn" data-role="gm" onclick="selectRole(this)">
+        <span class="role-icon">⭐</span>
+        <span class="role-btn-name">General Manager</span>
+        <span class="role-btn-sub">Full access</span>
+      </div>
+      <div class="role-btn" data-role="am" onclick="selectRole(this)">
+        <span class="role-icon">📋</span>
+        <span class="role-btn-name">Shift Lead</span>
+        <span class="role-btn-sub">FOH + BOH</span>
+      </div>
+      <div class="role-btn" data-role="foh" onclick="selectRole(this)">
+        <span class="role-icon">☕</span>
+        <span class="role-btn-name">FOH Staff</span>
+        <span class="role-btn-sub">Bar + Floor</span>
+      </div>
+      <div class="role-btn" data-role="boh" onclick="selectRole(this)">
+        <span class="role-icon">🍳</span>
+        <span class="role-btn-name">BOH Staff</span>
+        <span class="role-btn-sub">Kitchen</span>
+      </div>
+      <div class="role-btn" data-role="catering" onclick="selectRole(this)">
+        <span class="role-icon">📦</span>
+        <span class="role-btn-name">Catering</span>
+        <span class="role-btn-sub">Orders + Logistics</span>
+      </div>
+      <div class="role-btn" data-role="kitchen_lead" onclick="selectRole(this)">
+        <span class="role-icon">👨‍🍳</span>
+        <span class="role-btn-name">Kitchen Lead</span>
+        <span class="role-btn-sub">BOH + Catering</span>
+      </div>
+    </div>
+    <button class="login-btn" onclick="login()">Enter the floor →</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app-screen" class="screen">
+  <div class="app-header">
+    <div style="display:flex;align-items:baseline;gap:0;">
+      <div class="app-brand">HUTCH <span>&</span> WALDO</div>
+      <span class="app-location">Battery Park</span>
+    </div>
+    <div class="user-chip" onclick="logout()">
+      <div class="user-avatar" id="user-avatar"></div>
+      <span class="user-name" id="user-name-display"></span>
+    </div>
+  </div>
+
+  <div class="app-content">
+    <div id="tab-home" class="tab-view active"></div>
+    <div id="tab-checklists" class="tab-view"></div>
+    <div id="tab-duties" class="tab-view"></div>
+    <div id="tab-catering" class="tab-view"></div>
+    <div id="tab-notes" class="tab-view"></div>
+    <div id="tab-team" class="tab-view"></div>
+  </div>
+
+  <nav class="bottom-nav" id="bottom-nav"></nav>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SHEET_URL = 'YOUR_GOOGLE_SHEET_CSV_URL';
+
+const ROLES_CFG = {
+  gm:           { label:'General Manager', tabs:['home','checklists','duties','catering','notes','team'] },
+  am:           { label:'Shift Lead',      tabs:['home','checklists','duties','catering','notes'] },
+  foh:          { label:'FOH Staff',       tabs:['home','checklists','duties','notes'] },
+  boh:          { label:'BOH Staff',       tabs:['home','checklists','duties','notes'] },
+  kitchen_lead: { label:'Kitchen Lead',    tabs:['home','checklists','duties','catering','notes'] },
+  catering:     { label:'Catering Coord.', tabs:['home','catering','checklists','notes'] }
+};
+
+const TAB_META = {
+  home:       { icon:'🏠',  label:'Home' },
+  checklists: { icon:'✅',  label:'Checks' },
+  duties:     { icon:'📌',  label:'Duties' },
+  catering:   { icon:'📦', label:'Catering' },
+  notes:      { icon:'📢',  label:'Notes' },
+  team:       { icon:'👥',  label:'Team' }
+};
+
+const FOH_CHECKS = {
+  opening: { label:'FOH Opening', items:['Doors, windows, and outdoor signage checked','All FOH surfaces wiped and sanitized','Bar setup complete — espresso machine warmed and dialed in','POS opened, cash drawer counted and logged','Specials board updated with correct items','Condiment stations fully stocked','Milk, syrups, cups restocked to full par','Music on, lighting set, temperature comfortable','Pre-shift huddle completed'] },
+  midshift: { label:'FOH Mid-Shift', items:['Bar supplies restocked','Floor walked and wiped down','Bathroom checked and logged','Shift log updated with any issues','Catering pickups confirmed and staged'] },
+  closing: { label:'FOH Closing', items:['Bar cleaned down fully — machine backflushed','All surfaces sanitized','Cash drawer counted, variance documented','POS end-of-day reports run and saved','Chairs stacked or furniture reset','Lights off, music off, doors locked','Closing lead signs off'] }
+};
+
+const BOH_CHECKS = {
+  opening: { label:'BOH Opening', items:['Walk-in and reach-in temps logged','Line check completed — all items at correct temp','Prep list assigned and posted','Stations set up and sanitized','86d items communicated to FOH before open','Dish machine temp checked and logged','Catering orders for the day reviewed'] },
+  midshift: { label:'BOH Mid-Shift', items:['Prep items replenished as depleted','Walk-in checked for expired or mislabeled items','Dish pit cleared — no backlog','Food quality issues reported to kitchen lead','Catering orders checked against pickup schedule'] },
+  closing: { label:'BOH Closing', items:['All food labeled, dated, and stored correctly','Walk-in temp logged at close','All surfaces and equipment degreased and sanitized','Floor mopped and mop bucket cleaned','Trash removed and replaced','Kitchen Lead signs off on closing sheet','Equipment issues flagged to GM in writing'] }
+};
+
+const FOH_DUTIES = [
+  { label:'Head Barista', items:['Sets bar standard for every drink — every shot, every texture','Runs pre-shift bar setup and ensures equipment is dialed in','Trains baristas and signs off on readiness before solo shifts','Monitors ticket times and communicates pacing during rushes','Flags equipment issues immediately to AM or GM','Controls café inventory twice weekly','Leads 5-minute pre-shift huddle when AM is off floor','Signs off on bar closing duties'] },
+  { label:'Barista', items:['Executes all drink orders to standard — no freelancing without lead approval','Maintains bar cleanliness — wipe down every 20 min','Communicates modifications and special orders clearly with cashier','Restocks bar supplies mid-shift without being asked','Recovers any order mistakes at the bar','Completes bar opening or closing duties as assigned'] },
+  { label:'Counter / Cashier', items:['Owns the POS — zero unauthorized discounts','Reads full order back before submitting','Communicates catering pickups to BOH and bar 15 min out','Manages the queue during rushes — no silent pileups','Handles customer concerns — escalates in 2 min if unresolved','Reconciles drawer at end of shift, any variance reported to AM','Knows the full menu including specials and allergens'] },
+  { label:'Floor / Runner', items:['Tables turned within 5 minutes','Runs food and drinks — confirms every order before placing','Restocks condiment stations and napkins every 30 min','Checks in with seated guests — present, not intrusive','Floor walk at top of every hour — logs any issues','Bathroom check every 45 minutes — signs the log'] }
+];
+
+const BOH_DUTIES = [
+  { label:'Kitchen Lead', items:['Owns food quality, consistency, and speed on every plate','Sets prep list daily by 8am and assigns stations before service','Line check before every service: temp logs, freshness, portions','Manages food waste — tracks daily, reports weekly to GM','Communicates ticket volume to FOH through shift lead','Executes catering production per the prep sheet','Signs off on receiving orders — checks weights, temps, invoices','Leads BOH closing: deep clean, labeling, walk-in check, temp log'] },
+  { label:'Line Cook', items:['Executes orders to recipe standard — no improvisation on the line','Communicates ticket modifications immediately to lead','Keeps station organized — clean as you go is non-negotiable','Informs lead of low stock before running out — never mid-ticket','Does not leave station during service without flagging the lead'] },
+  { label:'Prep Cook', items:['Completes prep list before service window','Labels and dates all prepped items — no unlabeled containers in walk-in','Rotates stock using FIFO without exception','Notifies lead if prep cannot be completed in time','Assists with catering production when assigned'] },
+  { label:'Dishwasher / Porter', items:['Dish pit runs continuously — no stacking without washing','Clean dishes returned to line within 10 minutes of wash','Takes out trash at 75% capacity — does not wait to be asked','Mops: entry, mid-service, and close','Dish machine temp logged every 2 hours'] }
+];
+
+const CATERING_ORDERS = [
+  { id:1, client:'Hudson River Trust', date:'Today, 2:00 PM', headcount:18, items:'Sandwich platters x6, Salad bar x3, Coffee service x2', status:'confirmed', type:'pickup' },
+  { id:2, client:'Battery Park City Auth.', date:'Tomorrow, 11:30 AM', headcount:32, items:'Brunch spread, Pastry box x4, Juice service', status:'pending', type:'delivery' },
+  { id:3, client:'Skadden Arps LLP', date:'Fri, 9:00 AM', headcount:12, items:'Continental breakfast, Coffee + tea service', status:'ready', type:'pickup' }
+];
+
+const TEAM = [
+  { name:'Marcus T.', role:'Head Barista', shift:'6:30a – 2:30p', area:'foh' },
+  { name:'Nia W.', role:'Barista', shift:'7:00a – 3:00p', area:'foh' },
+  { name:'Devon P.', role:'Cashier', shift:'8:00a – 4:00p', area:'foh' },
+  { name:'Aaliyah M.', role:'Floor / Runner', shift:'10:00a – 4:00p', area:'foh' },
+  { name:'Chef Carlos R.', role:'Kitchen Lead', shift:'7:00a – 3:00p', area:'boh' },
+  { name:'Priya S.', role:'Line Cook', shift:'7:00a – 3:00p', area:'boh' },
+  { name:'James O.', role:'Prep Cook', shift:'6:30a – 2:30p', area:'boh' },
+  { name:'Tasha B.', role:'Dishwasher', shift:'8:00a – 4:00p', area:'boh' },
+  { name:'Sandra K.', role:'Catering Coord.', shift:'9:00a – 5:00p', area:'catering' }
+];
+
+let currentUser = null, selectedRole = null;
+let checkStates = {}, urgentOn = false;
+let gmNotes = [];
+
+function selectRole(btn) {
+  document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedRole = btn.dataset.role;
+}
+
+function login() {
+  const name = document.getElementById('name-input').value.trim();
+  if (!name) { showToast('Enter your name'); return; }
+  if (!selectedRole) { showToast('Select your role'); return; }
+  currentUser = { name, role: selectedRole };
+  localStorage.setItem('hw_user', JSON.stringify(currentUser));
+  checkStates = JSON.parse(localStorage.getItem('hw_checks') || '{}');
+  gmNotes = JSON.parse(localStorage.getItem('hw_notes') || '[]');
+  buildApp();
+  document.getElementById('login-screen').classList.remove('active');
+  document.getElementById('app-screen').classList.add('active');
+}
+
+function logout() {
+  if (!confirm('Sign out?')) return;
+  localStorage.removeItem('hw_user');
+  currentUser = null; selectedRole = null;
+  document.getElementById('app-screen').classList.remove('active');
+  document.getElementById('login-screen').classList.add('active');
+  document.getElementById('name-input').value = '';
+  document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('selected'));
+}
+
+function buildApp() {
+  const role = ROLES_CFG[currentUser.role];
+  const initials = currentUser.name.slice(0,2).toUpperCase();
+  document.getElementById('user-avatar').textContent = initials;
+  document.getElementById('user-name-display').textContent = currentUser.name;
+  buildNav(role.tabs);
+  buildHome(); buildChecklists(); buildDuties();
+  buildCatering(); buildNotes(); buildTeam();
+}
+
+function buildNav(tabs) {
+  const nav = document.getElementById('bottom-nav');
+  const hasUnread = gmNotes.some(n => !n.read) && currentUser.role !== 'gm';
+  nav.innerHTML = tabs.map(t => `
+    <button class="nav-item ${t==='home'?'active':''}" onclick="switchTab('${t}')" data-tab="${t}">
+      <span class="nav-icon">${TAB_META[t].icon}</span>
+      <span class="nav-label">${TAB_META[t].label}</span>
+      ${t==='notes' && hasUnread ? '<div class="notif-dot"></div>' : ''}
+    </button>`).join('');
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(`tab-${tab}`).classList.add('active');
+  document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+}
+
+function buildHome() {
+  const role = currentUser.role;
+  const done = Object.values(checkStates).filter(Boolean).length;
+  const total = getTotalChecks();
+
+  const urgentNotes = gmNotes.filter(n=>n.urgent);
+  const date = new Date().toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'});
+
+  document.getElementById('tab-home').innerHTML = `
+    <div class="tagline-badge">🐾 Good coffee, good people</div>
+
+    ${urgentNotes.length ? `<div class="urgent-banner-card" style="cursor:pointer;" onclick="switchTab('notes')">
+      <div>🔴</div>
+      <div>
+        <div class="note-text-b">${urgentNotes[0].text}</div>
+        <div class="note-from-b">Urgent from ${urgentNotes[0].from} · Tap to view all notes</div>
+      </div>
+    </div>` : ''}
+
+    <div class="stat-card" style="margin-bottom:0.9rem;">
+      <div class="stat-value">${done}/${total}</div>
+      <div class="stat-label">Checks Done Today</div>
+    </div>
+
+    <span class="section-label">Today — ${date}</span>
+    <div class="card">
+      <div class="duty-item"><div class="duty-dot"></div>Open <strong>Checks</strong> to complete your shift checklist</div>
+      <div class="duty-item"><div class="duty-dot"></div>Open <strong>Duties</strong> to review your responsibilities</div>
+      ${['gm','am','catering','kitchen_lead'].includes(role) ? '<div class="duty-item"><div class="duty-dot"></div>Open <strong>Catering</strong> to review today\'s orders</div>' : ''}
+      <div class="duty-item"><div class="duty-dot"></div>Open <strong>Notes</strong> for messages from the team</div>
+    </div>
+
+    <button class="btn primary" onclick="switchTab('checklists')">Open my checklist ✓</button>
+    <button class="btn secondary" onclick="switchTab('duties')">Review my duties</button>
+    ${role === 'gm' ? '<button class="btn secondary" onclick="switchTab(\'notes\')">Post a note to team</button>' : ''}
+  `;
+}
+
+function getTotalChecks() {
+  const role = currentUser.role;
+  let lists = [];
+  if (['foh','am','gm'].includes(role)) lists = Object.values(FOH_CHECKS);
+  else if (['boh','kitchen_lead'].includes(role)) lists = Object.values(BOH_CHECKS);
+  else if (role==='catering') lists = [FOH_CHECKS.opening];
+  return lists.reduce((a,l)=>a+l.items.length,0);
+}
+
+function buildChecklists() {
+  const role = currentUser.role;
+  let lists = {};
+  if (['foh','am','gm'].includes(role)) lists = FOH_CHECKS;
+  else if (['boh','kitchen_lead'].includes(role)) lists = BOH_CHECKS;
+  else lists = { opening: FOH_CHECKS.opening };
+
+  const html = Object.entries(lists).map(([key,list]) => {
+    const done = list.items.filter((_,i)=>checkStates[`${key}_${i}`]).length;
+    const pill = done===list.items.length?'done':done>0?'partial':'none';
+    return `<div class="card">
+      <div class="checklist-top">
+        <span class="checklist-title-text">${list.label}</span>
+        <span class="progress-pill ${pill}" id="pill_${key}">${done}/${list.items.length}</span>
+      </div>
+      ${list.items.map((t,i)=>`
+        <div class="check-item" onclick="toggleCheck('${key}',${i})">
+          <div class="check-box ${checkStates[`${key}_${i}`]?'checked':''}" id="cb_${key}_${i}"></div>
+          <span class="check-text ${checkStates[`${key}_${i}`]?'done':''}" id="ct_${key}_${i}">${t}</span>
+        </div>`).join('')}
+    </div>`;
+  }).join('');
+
+  document.getElementById('tab-checklists').innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.9rem;">
+      <div><div class="page-title">Checklists</div><div class="page-sub">Tap each item to mark complete</div></div>
+      <span class="reset-link" onclick="resetChecks()">Reset all</span>
+    </div>${html}`;
+}
+
+function toggleCheck(key, idx) {
+  const id = `${key}_${idx}`;
+  checkStates[id] = !checkStates[id];
+  localStorage.setItem('hw_checks', JSON.stringify(checkStates));
+  const cb = document.getElementById(`cb_${key}_${idx}`);
+  const ct = document.getElementById(`ct_${key}_${idx}`);
+  if(cb) cb.classList.toggle('checked', checkStates[id]);
+  if(ct) ct.classList.toggle('done', checkStates[id]);
+  const list = FOH_CHECKS[key] || BOH_CHECKS[key];
+  if(list) {
+    const done = list.items.filter((_,i)=>checkStates[`${key}_${i}`]).length;
+    const pill = document.getElementById(`pill_${key}`);
+    if(pill) { pill.textContent=`${done}/${list.items.length}`; pill.className=`progress-pill ${done===list.items.length?'done':done>0?'partial':'none'}`; }
+  }
+  if(checkStates[id]) showToast('Marked complete ✓');
+  buildHome();
+}
+
+function resetChecks() {
+  if(!confirm('Reset all checklists?')) return;
+  checkStates = {}; localStorage.setItem('hw_checks', JSON.stringify(checkStates));
+  buildChecklists(); buildHome(); showToast('Checklists reset');
+}
+
+function buildDuties() {
+  const role = currentUser.role;
+  let sections = [];
+  if (['foh','am'].includes(role)) sections = FOH_DUTIES;
+  else if (role==='boh') sections = BOH_DUTIES.slice(1);
+  else if (role==='kitchen_lead') sections = [BOH_DUTIES[0]];
+  else if (role==='catering') sections = [{ label:'Catering Coordinator', items:['Single point of contact for all catering clients from inquiry to completion','Maintains catering master log — updated within 2 hours of any change','Distributes prep sheets to BOH no later than 48 hours before order date','Manages catering calendar and prevents double-booking','Communicates all order changes to Kitchen Lead and GM immediately','Handles all client follow-ups and feedback collection'] }];
+  else if (role==='gm') sections = [
+    { label:'Daily time blocks', items:['7:30–8:30am — Review messages, check catering calendar, prep for the day','8:30–9:00am — Floor walk with opening leads — observe, do not intervene unless necessary','9:00–11:00am — Admin block: scheduling, emails, reports, vendor comms','11am–1:00pm — On the floor during peak — visible, accessible, present','1:00–2:30pm — 1:1s or catering coordination','2:30–4:00pm — Closing prep, inventory review, end-of-day admin','4:00–5:00pm — Brief closing leads, document the day, set priorities for tomorrow'] },
+    { label:'Weekly GM responsibilities', items:['Review prior week sales and compare to target','Review labor cost vs hours scheduled','Publish next week schedule by Thursday 5pm','1:1 with Kitchen Lead and AM','Review catering log — active and upcoming orders','Audit at least 2 shift checklists per team (FOH + BOH)','Floor observation — minimum 2 full service periods','Inventory order placed based on par levels','Log any incidents, complaints, or equipment issues','Team communication sent — weekly notes, updates, shoutouts'] }
+  ];
+
+  document.getElementById('tab-duties').innerHTML = `
+    <div class="page-title" style="margin-bottom:0.15rem;">My Duties</div>
+    <div class="page-sub" style="margin-bottom:1rem;">Your ownership every shift</div>
+    ${sections.map(s=>`
+      <span class="section-label">${s.label}</span>
+      <div class="card">${s.items.map(item=>`<div class="duty-item"><div class="duty-dot"></div>${item}</div>`).join('')}</div>
+    `).join('')}`;
+}
+
+function buildCatering() {
+  const orders = CATERING_ORDERS.map(o=>`
+    <div class="catering-card ${o.status}">
+      <div class="catering-client">${o.client}</div>
+      <div class="catering-meta">${o.date} · ${o.headcount} guests · ${o.type==='delivery'?'🚚 Delivery':'🏃 Pickup'}</div>
+      <div class="catering-detail">${o.items}</div>
+      <span class="status-badge sb-${o.status}">${o.status}</span>
+    </div>`).join('');
+
+  document.getElementById('tab-catering').innerHTML = `
+    <div class="page-title" style="margin-bottom:0.15rem;">Catering</div>
+    <div class="page-sub" style="margin-bottom:1rem;">Active orders and fulfillment process</div>
+    <span class="section-label">Active orders</span>
+    ${orders}
+    <hr>
+    <span class="section-label" style="margin-top:1rem;display:block;">Order flow</span>
+    <div class="card">
+      ${[['01','Inquiry received — collect date, headcount, menu, dietary, contact'],['02','Written quote sent within 24 hours. No confirmation without deposit'],['03','Order logged in master sheet same day'],['04','Kitchen briefed 48 hours out — prep sheet posted in BOH'],['05','Prep begins day before — Kitchen Lead signs off on readiness'],['06','Day-of assembly — two-person sign-off before anything leaves'],['07','Pickup confirmed or delivery photo sent — GM notified if late'],['08','Payment finalized — follow-up sent to client within 24 hours']].map(([n,t])=>`
+        <div class="duty-item">
+          <div style="width:22px;height:22px;border-radius:50%;background:var(--sky-pale);color:var(--sky-dark);display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;font-size:0.62rem;font-weight:800;flex-shrink:0;">${n}</div>
+          ${t}
+        </div>`).join('')}
+    </div>
+    <div class="alert-box">🐾 No verbal-only orders. No order confirmed without a deposit. Two signatures required before any order leaves the building.</div>`;
+}
+
+function buildNotes() {
+  const isGM = currentUser.role === 'gm';
+  const urgents = gmNotes.filter(n=>n.urgent);
+  const regular = gmNotes.filter(n=>!n.urgent);
+
+  let html = `<div class="page-title" style="margin-bottom:0.15rem;">${isGM?'Post a Note':'Team Notes'}</div>
+    <div class="page-sub" style="margin-bottom:1rem;">${isGM?'Send a message to your team':'Messages from the GM'}</div>`;
+
+  if (isGM) {
+    html += `<div class="note-compose">
+      <textarea id="note-textarea" placeholder="Type your message to the team..."></textarea>
+      <div class="audience-row">
+        <div class="aud-pill sel" data-aud="all" onclick="toggleAud(this)">All staff</div>
+        <div class="aud-pill" data-aud="foh" onclick="toggleAud(this)">FOH only</div>
+        <div class="aud-pill boh" data-aud="boh" onclick="toggleAud(this)">BOH only</div>
+        <div class="aud-pill cat" data-aud="catering" onclick="toggleAud(this)">Catering</div>
+      </div>
+      <div class="urgent-row">
+        <span class="urgent-label">Mark as urgent</span>
+        <div class="toggle-sw" id="urgent-toggle" onclick="toggleUrgent()"></div>
+      </div>
+      <button class="send-note-btn" id="send-btn" onclick="sendNote()">Send to team</button>
+    </div>`;
+
+    if (gmNotes.length) {
+      html += `<span class="section-label">Sent notes</span>`;
+      html += gmNotes.slice().reverse().map(n=>`
+        <div class="note-feed-card ${n.urgent?'urgent':'normal'}">
+          <div class="note-top-row">
+            <div><span class="note-from-name">You</span>${n.urgent?'<span class="urgent-flag">🔴 Urgent</span>':''}</div>
+            <span class="note-time-str">${n.time}</span>
+          </div>
+          <div class="note-body-text">${n.text}</div>
+          <span class="note-aud-badge nab-${n.audience==='all'?'all':n.audience==='foh'?'foh':n.audience==='boh'?'boh':'cat'}">${n.audience==='all'?'All staff':n.audience==='foh'?'FOH only':n.audience==='boh'?'BOH only':'Catering'}</span>
+        </div>`).join('');
+    }
+  } else {
+    if (urgents.length) {
+      urgents.forEach(n => {
+        html += `<div class="urgent-banner-card">
+          <div>🔴</div>
+          <div><div class="note-text-b">${n.text}</div><div class="note-from-b">Urgent from ${n.from} · ${n.time}</div></div>
+        </div>`;
+      });
+    }
+    if (regular.length) {
+      html += `<span class="section-label">From the GM</span>`;
+      html += regular.slice().reverse().map(n=>`
+        <div class="note-feed-card normal">
+          <div class="note-top-row">
+            <span class="note-from-name">${n.from}</span>
+            <span class="note-time-str">${n.time}</span>
+          </div>
+          <div class="note-body-text">${n.text}</div>
+          <span class="note-aud-badge nab-${n.audience==='all'?'all':n.audience==='foh'?'foh':n.audience==='boh'?'boh':'cat'}">${n.audience==='all'?'All staff':n.audience==='foh'?'FOH only':n.audience==='boh'?'BOH only':'Catering'}</span>
+        </div>`).join('');
+    }
+    if (!gmNotes.length) {
+      html += `<div class="alert-box">🐾 No notes yet. Check back during your shift for messages from the GM.</div>`;
+    }
+  }
+
+  document.getElementById('tab-notes').innerHTML = html;
+  urgentOn = false;
+}
+
+function toggleAud(pill) {
+  document.querySelectorAll('.aud-pill').forEach(p=>p.classList.remove('sel'));
+  pill.classList.add('sel');
+}
+
+function toggleUrgent() {
+  urgentOn = !urgentOn;
+  const t = document.getElementById('urgent-toggle');
+  if(t) t.classList.toggle('on', urgentOn);
+}
+
+function sendNote() {
+  const text = document.getElementById('note-textarea').value.trim();
+  if (!text) { showToast('Write a message first'); return; }
+  const selAud = document.querySelector('.aud-pill.sel');
+  const audience = selAud ? selAud.dataset.aud : 'all';
+  const now = new Date();
+  const time = now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  const note = { text, audience, urgent:urgentOn, from:currentUser.name, time, id: Date.now() };
+  gmNotes.push(note);
+  localStorage.setItem('hw_notes', JSON.stringify(gmNotes));
+  const btn = document.getElementById('send-btn');
+  if(btn) { btn.textContent='Sent ✓'; btn.classList.add('sent'); }
+  setTimeout(()=>{ buildNotes(); buildHome(); buildNav(ROLES_CFG[currentUser.role].tabs); showToast('Note sent to team'); }, 900);
+}
+
+function buildTeam() {
+  if (!['gm','am'].includes(currentUser.role)) return;
+  const byArea = { foh:[], boh:[], catering:[] };
+  TEAM.forEach(m => { if(byArea[m.area]) byArea[m.area].push(m); else byArea.foh.push(m); });
+
+  const section = (label, members) => members.length ? `
+    <span class="section-label">${label}</span>
+    <div class="card">${members.map(m=>`
+      <div class="schedule-row">
+        <div><div class="sched-name">${m.name}</div><div class="sched-role">${m.role}</div></div>
+        <div class="sched-time">${m.shift}</div>
+      </div>`).join('')}
+    </div>` : '';
+
+  document.getElementById('tab-team').innerHTML = `
+    <div class="page-title" style="margin-bottom:0.15rem;">Today's Team</div>
+    <div class="page-sub" style="margin-bottom:1rem;">On shift right now</div>
+    ${section('Front of House', byArea.foh)}
+    ${section('Back of House', byArea.boh)}
+    ${section('Catering', byArea.catering)}
+    <div class="alert-box">🐾 Update the roster in your GM admin system to reflect the live schedule.</div>`;
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(()=>{});
+}
+
+const saved = localStorage.getItem('hw_user');
+if (saved) {
+  try {
+    currentUser = JSON.parse(saved);
+    selectedRole = currentUser.role;
+    checkStates = JSON.parse(localStorage.getItem('hw_checks')||'{}');
+    gmNotes = JSON.parse(localStorage.getItem('hw_notes')||'[]');
+    buildApp();
+    document.getElementById('login-screen').classList.remove('active');
+    document.getElementById('app-screen').classList.add('active');
+  } catch(e) { localStorage.removeItem('hw_user'); }
+}
+</script>
+</body>
+</html>
