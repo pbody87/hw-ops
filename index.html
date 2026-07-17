@@ -741,10 +741,61 @@ const ROSTER = {
 const ROLE_TEAM_LABEL = { gm:'General Manager', am:'2IC', foh:'FOH Staff' };
 const TEAM = Object.values(ROSTER).map(p => ({
   name: p.name,
-  role: ROLE_TEAM_LABEL[p.role] || p.role,
-  shift: 'Varies — see published schedule',
-  area: 'foh'
+  role: ROLE_TEAM_LABEL[p.role] || p.role
 }));
+
+// Weekly shift schedule for the "Today's Team" tab.
+// Replace this whole block each week with the new schedule (send Patty the updated PDF/screenshot).
+// dayKey matches JS's en-US short weekday name: Mon/Tue/Wed/Thu/Fri/Sat/Sun.
+const SCHEDULE = {
+  weekOf: 'Jul 20, 2026',
+  weekStart: '2026-07-20', // ISO date of the Monday this schedule covers
+  days: {
+    Mon: [
+      { name:'Christopher Collier',    shift:'6:30a - 3:00p',  station:'BAR 1' },
+      { name:'Jayne Elise Dolinsky',   shift:'6:30a - 2:00p',  station:'POS 1' },
+      { name:'Marlon Gomez Hernandez', shift:'8:00a - 4:30p',  station:'BAR 1' }
+    ],
+    Tue: [
+      { name:'Crystal Vanessa Vasquez',   shift:'6:30a - 2:00p',  station:'2IC' },
+      { name:'Lisselys Martinez Sequera', shift:'8:00a - 3:00p',  station:'FOH EXPO' },
+      { name:'Marlon Gomez Hernandez',    shift:'8:00a - 4:30p',  station:'BAR 1' },
+      { name:'Melanie Moreno',            shift:'6:30a - 2:00p',  station:'BAR 1' },
+      { name:'Rahul Amin',                shift:'10:00a - 4:30p', station:'BAR 1' }
+    ],
+    Wed: [
+      { name:'Crystal Vanessa Vasquez',   shift:'6:30a - 2:00p',  station:'2IC' },
+      { name:'Jayne Elise Dolinsky',      shift:'10:00a - 4:30p', station:'POS 2' },
+      { name:'Lisselys Martinez Sequera', shift:'8:00a - 2:00p',  station:'FOH EXPO' },
+      { name:'Marlon Gomez Hernandez',    shift:'8:00a - 4:30p',  station:'BAR 1' },
+      { name:'Melanie Moreno',            shift:'6:30a - 2:00p',  station:'BAR 1' }
+    ],
+    Thu: [
+      { name:'Crystal Vanessa Vasquez',   shift:'10:00a - 4:30p', station:'2IC' },
+      { name:'Jayne Elise Dolinsky',      shift:'10:00a - 4:30p', station:'POS 1' },
+      { name:'Lisselys Martinez Sequera', shift:'8:00a - 4:30p',  station:'FOH EXPO' },
+      { name:'Melanie Moreno',            shift:'6:30a - 2:00p',  station:'BAR 1' }
+    ],
+    Fri: [
+      { name:'Christopher Collier',     shift:'6:30a - 2:00p', station:'BAR 1' },
+      { name:'Crystal Vanessa Vasquez', shift:'8:00a - 4:30p', station:'2IC' },
+      { name:'Jayne Elise Dolinsky',    shift:'8:00a - 4:30p', station:'BAR 1' },
+      { name:'Melanie Moreno',          shift:'6:30a - 2:00p', station:'POS 1' }
+    ],
+    Sat: [
+      { name:'Crystal Vanessa Vasquez',   shift:'8:00a - 4:30p',  station:'2IC' },
+      { name:'Marlon Gomez Hernandez',    shift:'8:00a - 4:30p',  station:'BAR 1' },
+      { name:'Melanie Moreno',            shift:'6:30a - 2:00p',  station:'BAR 1' },
+      { name:'Rahul Amin',                shift:'10:00a - 4:30p', station:'POS 1' }
+    ],
+    Sun: [
+      { name:'Christopher Collier',       shift:'6:30a - 3:00p',  station:'BAR 1' },
+      { name:'Jayne Elise Dolinsky',      shift:'8:00a - 4:30p',  station:'BAR 1' },
+      { name:'Lisselys Martinez Sequera', shift:'6:30a - 2:00p',  station:'POS 1' },
+      { name:'Rahul Amin',                shift:'10:00a - 4:30p', station:'BAR 1' }
+    ]
+  }
+};
 
 let currentUser = null, selectedRole = null;
 let checkStates = {}, urgentOn = false;
@@ -1055,25 +1106,35 @@ function sendNote() {
 
 function buildTeam() {
   if (!['gm','am'].includes(currentUser.role)) return;
-  const byArea = { foh:[], boh:[], catering:[] };
-  TEAM.forEach(m => { if(byArea[m.area]) byArea[m.area].push(m); else byArea.foh.push(m); });
 
-  const section = (label, members) => members.length ? `
-    <span class="section-label">${label}</span>
-    <div class="card">${members.map(m=>`
+  const now = new Date();
+  const dayKey = now.toLocaleDateString('en-US', {weekday:'short'});
+  const todayShifts = (SCHEDULE.days[dayKey] || []).slice().sort((a,b) => a.shift.localeCompare(b.shift));
+
+  const weekStart = new Date(SCHEDULE.weekStart + 'T00:00:00');
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekEnd.getDate() + 6);
+  const isStale = now < weekStart || now > weekEnd;
+
+  const todayRows = todayShifts.length ? todayShifts.map(m => `
+      <div class="schedule-row">
+        <div><div class="sched-name">${m.name}</div><div class="sched-role">${m.station}</div></div>
+        <div class="sched-time">${m.shift}</div>
+      </div>`).join('') : `
+      <div class="schedule-row"><div class="sched-name">No one scheduled today</div></div>`;
+
+  const rosterRows = TEAM.map(m => `
       <div class="schedule-row">
         <div><div class="sched-name">${m.name}</div><div class="sched-role">${m.role}</div></div>
-        <div class="sched-time">${m.shift}</div>
-      </div>`).join('')}
-    </div>` : '';
+      </div>`).join('');
 
   document.getElementById('tab-team').innerHTML = `
     <div class="page-title" style="margin-bottom:0.15rem;">Today's Team</div>
-    <div class="page-sub" style="margin-bottom:1rem;">On shift right now</div>
-    ${section('Front of House', byArea.foh)}
-    ${section('Back of House', byArea.boh)}
-    ${section('Catering', byArea.catering)}
-    <div class="alert-box">🐾 Update the roster in your GM admin system to reflect the live schedule.</div>`;
+    <div class="page-sub" style="margin-bottom:1rem;">On shift today · Week of ${SCHEDULE.weekOf}</div>
+    <div class="card">${todayRows}</div>
+    ${isStale ? `<div class="alert-box">🐾 This schedule is for the week of ${SCHEDULE.weekOf} — send the new week's schedule to update it.</div>` : ''}
+    <span class="section-label">Full Staff Roster</span>
+    <div class="card">${rosterRows}</div>`;
 }
 
 function showToast(msg) {
