@@ -1008,7 +1008,9 @@ function login() {
   if (!selectedRole) { showToast('Select your role'); return; }
   const entry = ROSTER[typed.toLowerCase().replace(/\s+/g,' ')];
   if (!entry) { showToast("Name not found on staff list — check spelling"); return; }
-  if (entry.role !== selectedRole) {
+  // GM can access every profile (to cover shifts, spot-check other roles, etc.) — everyone else
+  // is locked to their assigned role.
+  if (entry.role !== 'gm' && entry.role !== selectedRole) {
     showToast(`That's not your profile — you're listed as ${ROLES_CFG[entry.role].label}`);
     return;
   }
