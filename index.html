@@ -614,8 +614,8 @@ hr { border: none; border-top: 1.5px solid var(--border); margin: 1rem 0; }
     <p>Good coffee, good people</p>
   </div>
   <div class="login-box">
-    <span class="login-label">Your name</span>
-    <input class="name-input" id="name-input" type="text" placeholder="First name" autocomplete="off" autocorrect="off">
+    <span class="login-label">Your full name</span>
+    <input class="name-input" id="name-input" type="text" placeholder="First and last name" autocomplete="off" autocorrect="off">
     <span class="login-label">Your role</span>
     <div class="role-grid" id="role-grid">
       <div class="role-btn" data-role="gm" onclick="selectRole(this)">
@@ -723,17 +723,28 @@ const CATERING_ORDERS = [
   { id:3, client:'Skadden Arps LLP', date:'Fri, 9:00 AM', headcount:12, items:'Continental breakfast, Coffee + tea service', status:'ready', type:'pickup' }
 ];
 
-const TEAM = [
-  { name:'Marcus T.', role:'Head Barista', shift:'6:30a – 2:30p', area:'foh' },
-  { name:'Nia W.', role:'Barista', shift:'7:00a – 3:00p', area:'foh' },
-  { name:'Devon P.', role:'Cashier', shift:'8:00a – 4:00p', area:'foh' },
-  { name:'Aaliyah M.', role:'Floor / Runner', shift:'10:00a – 4:00p', area:'foh' },
-  { name:'Chef Carlos R.', role:'Kitchen Lead', shift:'7:00a – 3:00p', area:'boh' },
-  { name:'Priya S.', role:'Line Cook', shift:'7:00a – 3:00p', area:'boh' },
-  { name:'James O.', role:'Prep Cook', shift:'6:30a – 2:30p', area:'boh' },
-  { name:'Tasha B.', role:'Dishwasher', shift:'8:00a – 4:00p', area:'boh' },
-  { name:'Sandra K.', role:'Catering Coord.', shift:'9:00a – 5:00p', area:'catering' }
-];
+// Source of truth for who can log in as which profile.
+// Key is the staff member's full name, lowercased. Add/edit entries here as staff change.
+const ROSTER = {
+  'patricia germain':          { role:'gm',  name:'Patricia Germain' },
+  'crystal vanessa vasquez':   { role:'am',  name:'Crystal Vanessa Vasquez' },
+  'christopher collier':       { role:'foh', name:'Christopher Collier' },
+  'jack roden':                { role:'foh', name:'Jack Roden' },
+  'jayne elise dolinsky':      { role:'foh', name:'Jayne Elise Dolinsky' },
+  'lisselys martinez sequera': { role:'foh', name:'Lisselys Martinez Sequera' },
+  'marlon gomez hernandez':    { role:'foh', name:'Marlon Gomez Hernandez' },
+  'melanie moreno':            { role:'foh', name:'Melanie Moreno' },
+  'rahul amin':                { role:'foh', name:'Rahul Amin' },
+  'seb hickey':                { role:'foh', name:'Seb Hickey' }
+};
+
+const ROLE_TEAM_LABEL = { gm:'General Manager', am:'2IC', foh:'FOH Staff' };
+const TEAM = Object.values(ROSTER).map(p => ({
+  name: p.name,
+  role: ROLE_TEAM_LABEL[p.role] || p.role,
+  shift: 'Varies — see published schedule',
+  area: 'foh'
+}));
 
 let currentUser = null, selectedRole = null;
 let checkStates = {}, urgentOn = false;
@@ -746,10 +757,16 @@ function selectRole(btn) {
 }
 
 function login() {
-  const name = document.getElementById('name-input').value.trim();
-  if (!name) { showToast('Enter your name'); return; }
+  const typed = document.getElementById('name-input').value.trim();
+  if (!typed) { showToast('Enter your full name'); return; }
   if (!selectedRole) { showToast('Select your role'); return; }
-  currentUser = { name, role: selectedRole };
+  const entry = ROSTER[typed.toLowerCase().replace(/\s+/g,' ')];
+  if (!entry) { showToast("Name not found on staff list — check spelling"); return; }
+  if (entry.role !== selectedRole) {
+    showToast(`That's not your profile — you're listed as ${ROLES_CFG[entry.role].label}`);
+    return;
+  }
+  currentUser = { name: entry.name, role: selectedRole };
   localStorage.setItem('hw_user', JSON.stringify(currentUser));
   checkStates = JSON.parse(localStorage.getItem('hw_checks') || '{}');
   gmNotes = JSON.parse(localStorage.getItem('hw_notes') || '[]');
